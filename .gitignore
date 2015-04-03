@@ -1,0 +1,7 @@
+*.sw*
+*.pyc
+build
+test
+debian/files
+debian/python-webhdfs*
+*.egg-info/
