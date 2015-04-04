@@ -26,7 +26,7 @@ class WebHDFSObject(object):
         return self.full
 
     def _prep(self):
-        self.calc['date'] = datetime.datetime.fromtimestamp(self.bits['modificationTime'] / 1000),
+        self.calc['date'] = datetime.datetime.fromtimestamp(self.bits['modificationTime'] / 1000)
         self.calc['perm'] = int(self.bits['permission'], 8)
 
         pmap = list(reversed('rwxrwxrwx'))
@@ -37,7 +37,7 @@ class WebHDFSObject(object):
                 mode[-1] = c
                 break
         else:
-            mode[-1] = 'r'
+            mode[-1] = '-'
 
         self.calc['mode'] = ''.join(mode)
 
@@ -61,6 +61,10 @@ class WebHDFSObject(object):
     @property
     def size(self):
         return self.bits['length']
+
+    @property
+    def repl(self):
+        return self.bits['replication']
 
     @property
     def kind(self):

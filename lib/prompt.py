@@ -100,7 +100,33 @@ class WebHDFSPrompt(cmd.Cmd):
     def do_ls(self, path=None):
         try:
             path = self.normalize(path)
-            print '\n'.join(str(i) for i in self.hdfs.ls(path))
+
+            objects = []
+            columns = ['mode', 'repl', 'owner', 'group', 'size', 'date', 'name']
+            lengths = dict(zip(columns, [0] * len(columns)))
+            builds = {
+                'date': '{:%b %d %Y %H:%M:%S}',
+            }
+            places = {
+                'repl': '>',
+                'size': '>',
+            }
+
+            for item in self.hdfs.ls(path):
+                dfs_obj = {}
+
+                for name in columns:
+                    attr = builds.get(name, '{}').format(getattr(item, name))
+
+                    dfs_obj[name] = attr
+                    lengths[name] = max(lengths[name], len(attr))
+
+                objects.append(dfs_obj)
+
+            fmts = ' '.join('{%s:%s%s}' % (i, places.get(i, ''), lengths[i]) for i in columns)
+            for item in objects:
+                print fmts.format(**item)
+
         except WebHDFSError as e:
             print e
 
