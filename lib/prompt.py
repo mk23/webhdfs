@@ -25,7 +25,7 @@ class WebHDFSPrompt(cmd.Cmd):
         self.cmds.update({
             'lcd':  True,
             'lls':  True,
-            'lpwd': True,
+            'put':  True,
         })
 
         self.do_cd()
@@ -172,12 +172,6 @@ class WebHDFSPrompt(cmd.Cmd):
             print self.hdfs.du(path)
         except WebHDFSError as e:
             print e
-
-    def do_pwd(self, _):
-        print self.path
-
-    def do_lpwd(self, _):
-        print os.getcwd()
 
     def do_mkdir(self, path):
         try:
