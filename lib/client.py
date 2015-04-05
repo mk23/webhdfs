@@ -3,8 +3,8 @@ import logging
 import requests
 import tempfile
 
-from webhdfs import WebHDFSError
-from webhdfs import WebHDFSObject
+from errors import WebHDFSError
+from attrib import WebHDFSObject
 
 LOG = logging.getLogger()
 

@@ -6,10 +6,9 @@ import stat
 import urlparse
 import zlib
 
-from webhdfs import WebHDFSError
-from webhdfs import WebHDFSClient
-from webhdfs import LocalFSObject
-
+from errors import WebHDFSError
+from attrib import WebHDFSClient
+from attrib import LocalFSObject
 
 
 class WebHDFSPrompt(cmd.Cmd):
