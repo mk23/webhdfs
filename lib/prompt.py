@@ -1,7 +1,5 @@
 import cmd
-import datetime
 import getpass
-import grp
 import os
 import pwd
 import stat
@@ -9,8 +7,9 @@ import urlparse
 import zlib
 
 from webhdfs import WebHDFSError
-from webhdfs import WebHDFSObject
 from webhdfs import WebHDFSClient
+from webhdfs import LocalFSObject
+
 
 
 class WebHDFSPrompt(cmd.Cmd):
@@ -30,7 +29,37 @@ class WebHDFSPrompt(cmd.Cmd):
 
         self.do_cd()
 
-    def normalize(self, path, local=False, required=False):
+    def _list_dir(self, sources):
+        objects = []
+        columns = ['mode', 'repl', 'owner', 'group', 'size', 'date', 'name']
+        lengths = dict(zip(columns, [0] * len(columns)))
+        build = {
+            'date': '{:%b %d %Y %H:%M:%S}',
+        }
+        align = {
+            'repl': '>',
+            'size': '>',
+        }
+
+        for item in sources:
+            if not stat.S_ISREG(item.perm) and not stat.S_ISDIR(item.perm):
+                continue
+
+            tmp_obj = {}
+
+            for name in columns:
+                text = build.get(name, '{}').format(getattr(item, name))
+
+                tmp_obj[name] = text
+                lengths[name] = max(lengths[name], len(text))
+
+            objects.append(tmp_obj)
+
+        text = ' '.join('{%s:%s%s}' % (i, align.get(i, ''), lengths[i]) for i in columns)
+        for item in objects:
+            print text.format(**item)
+
+    def _fix_path(self, path, local=False, required=False):
         path = '' if path is None else path.strip()
         rval = []
 
@@ -51,6 +80,9 @@ class WebHDFSPrompt(cmd.Cmd):
                 rval.append(part)
 
         return '/'+'/'.join(rval)
+
+    def _reset_prompt(self):
+        self.prompt = '%s@%s r:%s l:%s> ' % (self.user, self.base.netloc, self.path, os.getcwd())
 
     def emptyline(self):
         pass
@@ -80,109 +112,70 @@ class WebHDFSPrompt(cmd.Cmd):
 
     def do_cd(self, path=None):
         try:
-            path = self.normalize(path or '/user/%s' % self.user)
+            path = self._fix_path(path or '/user/%s' % self.user)
             if not self.hdfs.stat(path).is_dir():
-                print '%s: not a directory' % path
-
+                raise WebHDFSError('%s: not a directory' % path)
             self.path = path
-            self.prompt = '%s@%s r:%s l:%s> ' % (self.user, self.base.netloc, self.path, os.getcwd())
         except WebHDFSError as e:
+            self.path = '/'
             print e
+        finally:
+            self._reset_prompt()
 
-    def do_lcd(self, path=None, local=True):
+    def do_lcd(self, path=None):
         try:
-            path = self.normalize(path, local=True)
+            path = self._fix_path(path or pwd.getpwnam(self.user).pw_dir, local=True)
             os.chdir(path)
-            self.prompt = '%s@%s r:%s l:%s> ' % (self.user, self.base.netloc, self.path, os.getcwd())
-        except OSError as e:
+        except (KeyError, OSError) as e:
             print e
+        finally:
+            self._reset_prompt()
 
     def do_ls(self, path=None):
         try:
-            path = self.normalize(path)
-
-            objects = []
-            columns = ['mode', 'repl', 'owner', 'group', 'size', 'date', 'name']
-            lengths = dict(zip(columns, [0] * len(columns)))
-            builds = {
-                'date': '{:%b %d %Y %H:%M:%S}',
-            }
-            places = {
-                'repl': '>',
-                'size': '>',
-            }
-
-            for item in self.hdfs.ls(path):
-                dfs_obj = {}
-
-                for name in columns:
-                    attr = builds.get(name, '{}').format(getattr(item, name))
-
-                    dfs_obj[name] = attr
-                    lengths[name] = max(lengths[name], len(attr))
-
-                objects.append(dfs_obj)
-
-            fmts = ' '.join('{%s:%s%s}' % (i, places.get(i, ''), lengths[i]) for i in columns)
-            for item in objects:
-                print fmts.format(**item)
-
+            path = self._fix_path(path)
+            self._list_dir(self.hdfs.ls(path))
         except WebHDFSError as e:
             print e
 
     def do_lls(self, path=None):
-        def print_item(names):
-            if isinstance(names, str):
-                names = [names]
-
-            for name in names:
-                item = os.stat(name)
-                if not stat.S_ISDIR(item.st_mode) and not stat.S_ISREG(item.st_mode):
-                    continue
-
-                try:
-                    owner = pwd.getpwuid(item.st_uid).pw_name
-                except KeyError:
-                    owner = item.st_uid
-
-                try:
-                    group = grp.getgrgid(item.st_gid).gr_name
-                except KeyError:
-                    group = item.st_gid
-
-                perm = (0o0777 & item.st_mode) | (int(stat.S_ISDIR(item.st_mode)) << 9)
-                date = datetime.datetime.fromtimestamp(item.st_mtime)
-                mode = ''.join( WebHDFSObject.pmap[i] if perm & (1 << (i)) else '-' for i in range(len(WebHDFSObject.pmap) - 1, -1, -1) )
-
-                print '{} {:>3} {:<15} {:<15} {:>15} {:%b %d %Y %H:%M:%S} {}'.format(mode, item.st_nlink, owner, group, item.st_size, date, name)
-
         try:
-            path = self.normalize(path, local=True)
-            item = os.stat(path)
-            if stat.S_ISDIR(item.st_mode):
-                print_item(os.listdir(path))
-            else:
-                print_item(path)
+            path = self._fix_path(path, local=True)
+            info = os.stat(path)
+            objs = []
+
+            if stat.S_ISDIR(info.st_mode):
+                objs = list(LocalFSObject(path, name) for name in os.listdir(path))
+            elif stat.S_ISREG(info.st_mode):
+                objs = [LocalFSObject(os.path.dirname(path), os.path.basename(path))]
+
+            self._list_dir(objs)
         except OSError as e:
             print e
 
     def do_du(self, path=None):
         try:
-            path = self.normalize(path)
+            path = self._fix_path(path)
             print self.hdfs.du(path)
         except WebHDFSError as e:
             print e
 
     def do_mkdir(self, path):
         try:
-            path = self.normalize(path, required='mkdir')
+            path = self._fix_path(path, required='mkdir')
+            try:
+                self.hdfs.stat(path)
+            except WebHDFSError as e:
+                pass
+            else:
+                raise WebHDFSError('%s: already exists' % path)
             self.hdfs.mkdir(path)
         except WebHDFSError as e:
             print e
 
     def do_rm(self, path):
         try:
-            path = self.normalize(path, required='rm')
+            path = self._fix_path(path, required='rm')
             if self.hdfs.stat(path).is_dir():
                 raise WebHDFSError('%s: cannot remove directory' % path)
             self.hdfs.rm(path)
@@ -191,7 +184,7 @@ class WebHDFSPrompt(cmd.Cmd):
 
     def do_rmdir(self, path):
         try:
-            path = self.normalize(path, required='rmdir')
+            path = self._fix_path(path, required='rmdir')
             if not self.hdfs.stat(path).is_dir():
                 raise WebHDFSError('%s: not a directory' % path)
             if self.hdfs.ls(path):
@@ -202,7 +195,7 @@ class WebHDFSPrompt(cmd.Cmd):
 
     def do_get(self, path):
         try:
-            path = self.normalize(path, required='get')
+            path = self._fix_path(path, required='get')
             if self.hdfs.stat(path).is_dir():
                 raise WebHDFSError('%s: cannot download directory' % path)
             if os.path.exists(os.path.basename(path)):
@@ -213,16 +206,23 @@ class WebHDFSPrompt(cmd.Cmd):
 
     def do_put(self, path):
         try:
-            path = self.normalize(path, local=True, required='put')
+            path = self._fix_path(path, local=True, required='put')
+            dest = '%s/%s' % (self.path, os.path.basename(path))
             if stat.S_ISDIR(os.stat(path).st_mode):
                 raise WebHDFSError('%s: cannot upload directory' % path)
-            self.hdfs.put('%s/%s' % (self.path, os.path.basename(path)), data=open(path, 'r'))
+            try:
+                self.hdfs.stat(dest)
+            except WebHDFSError as e:
+                pass
+            else:
+                raise WebHDFSError('%s: already exists' % dest)
+            self.hdfs.put(dest, data=open(path, 'r'))
         except (WebHDFSError, OSError) as e:
             print e
 
     def do_cat(self, path):
         try:
-            path = self.normalize(path, required='cat')
+            path = self._fix_path(path, required='cat')
             if self.hdfs.stat(path).is_dir():
                 raise WebHDFSError('%s: cannot cat directory' % path)
             print self.hdfs.get(path)
@@ -231,7 +231,7 @@ class WebHDFSPrompt(cmd.Cmd):
 
     def do_zcat(self, path):
         try:
-            path = self.normalize(path, required='zcat')
+            path = self._fix_path(path, required='zcat')
             if self.hdfs.stat(path).is_dir():
                 raise WebHDFSError('%s: cannot cat directory' % path)
             print zlib.decompress(self.hdfs.get(path), 16 + zlib.MAX_WBITS)
