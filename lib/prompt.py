@@ -166,6 +166,13 @@ class WebHDFSPrompt(cmd.Cmd):
         except OSError as e:
             print e
 
+    def do_du(self, path=None):
+        try:
+            path = self.normalize(path)
+            print self.hdfs.du(path)
+        except WebHDFSError as e:
+            print e
+
     def do_pwd(self, _):
         print self.path
 
