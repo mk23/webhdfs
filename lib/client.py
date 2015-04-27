@@ -56,6 +56,10 @@ class WebHDFSClient(object):
         for k, v in sorted(rsp.headers.iteritems()):
             LOG.debug('  %%-%ds : %%s' % w, k, v)
 
+    def stat(self, path):
+        r = self._req('GETFILESTATUS', path)
+        return WebHDFSObject(path, r['FileStatus'])
+
     def ls(self, path, recurse=False):
         l = []
         r = self._req('LISTSTATUS', path)
@@ -69,10 +73,6 @@ class WebHDFSClient(object):
     def du(self, path, real=False):
         r = self._req('GETCONTENTSUMMARY', path)
         return r['ContentSummary']['length'] if not real else r['ContentSummary']['spaceConsumed']
-
-    def stat(self, path):
-        r = self.req('GETFILESTATUS', path)
-        return WebHDFSObject(path, r['FileStatus'])
 
     def mkdir(self, path):
         r = self._req('MKDIRS', path, 'put')
