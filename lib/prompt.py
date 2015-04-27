@@ -7,7 +7,7 @@ import urlparse
 import zlib
 
 from errors import WebHDFSError
-from attrib import WebHDFSClient
+from client import WebHDFSClient
 from attrib import LocalFSObject
 
 
