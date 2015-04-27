@@ -24,7 +24,7 @@ class WebHDFSClient(object):
                 self._log(r)
                 r.raise_for_status()
                 return r.json()
-            elif 'r' in data.mode:
+            elif kind == 'put':
                 r = requests.put(u, params=args, allow_redirects=False)
                 self._log(r)
                 r.raise_for_status()
@@ -110,6 +110,9 @@ class WebHDFSClient(object):
             temp = tempfile.TemporaryFile()
             temp.write(data)
             temp.flush()
+            temp.seek(0)
+
+            LOG.debug('%s: saved %d bytes to temp file', temp.name, len(data))
             data = temp
 
         self._req('CREATE', path, 'put', data=data)
