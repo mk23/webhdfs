@@ -44,6 +44,11 @@ class WebHDFSObject(object):
     def __init__(self, path, bits):
         self.path = path.rstrip('/')
         self.bits = bits
+
+        if not self.bits['pathSuffix']:
+            self.bits['pathSuffix'] = os.path.basename(self.path)
+            self.path = os.path.dirname(self.path).rstrip('/')
+
         self.calc = {
             'date': datetime.datetime.fromtimestamp(self.bits['modificationTime'] / 1000),
             'perm': int(self.bits['permission'], 8) | (stat.S_IFDIR if self.is_dir() else stat.S_IFREG),
