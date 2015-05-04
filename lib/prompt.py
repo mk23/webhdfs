@@ -2,6 +2,7 @@ import cmd
 import getpass
 import os
 import pwd
+import readline
 import stat
 import urlparse
 import zlib
@@ -10,6 +11,8 @@ from errors import WebHDFSError
 from client import WebHDFSClient
 from attrib import LocalFSObject
 
+# Work around python's overeager completer delimiters
+readline.set_completer_delims(readline.get_completer_delims().translate(None, '-'))
 
 class WebHDFSPrompt(cmd.Cmd):
     def __init__(self, base):
