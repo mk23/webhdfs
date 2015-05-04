@@ -1,0 +1,26 @@
+webhdfs (1.0) stable; urgency=medium
+
+  * Tagging initial 1.0
+  * [571f7f9] Remove - from readline's completer delims, fixing objects
+    with dashes in the name.
+  * [902ea39] Add debian and release support.
+  * [735c3eb] Add documentation and license.
+  * [6ea361d] Move stat() closer to ls().
+  * [91816bc] Fix string-based upload by rewinding the temp file handle
+    before handing it to requests.
+  * [3a0704e] Mark _log and _req methods as private.
+  * [c8b855b] Detect directory vs file attributes.
+  * [2d58b5a] Fix shell client library import.
+  * [9debed5] Make other API classes available from base module.
+  * [c203a27] Rename object.py -> attrib.py and clean up base imports.
+  * [c1c3b42] Migrate LocalFSObject to object.py.  Fix ls, lls, cd, lcd
+    shell commands.  Throw already exist errors in mkdir and put shell
+    commands.
+  * [76dfc0e] Remove pwd and lpwd shell commands since paths are
+    displayed in the prompt.
+  * [cb19b47] Add shell du command.
+  * [5d032bb] Fix shell ls output.
+  * [3720f31] Fix null logging.
+  * [d81bd34] Initial commit.
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Mon, 04 May 2015 03:02:55 -0700
