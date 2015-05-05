@@ -331,6 +331,36 @@ False
 True
 ```
 
+Usage
+-----
+```
+usage: bin [-h] [-l LOG] [-c CFG] url
+
+webhdfs shell
+
+positional arguments:
+  url                webhdfs base url
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -l LOG, --log LOG  logger destination url
+  -c CFG, --cfg CFG  hdfs configuration dir
+
+supported logger formats:
+  console://?level=LEVEL
+  file://PATH?level=LEVEL
+  syslog+tcp://HOST:PORT/?facility=FACILITY&level=LEVEL
+  syslog+udp://HOST:PORT/?facility=FACILITY&level=LEVEL
+  syslog+unix://PATH?facility=FACILITY&level=LEVEL
+```
+
+Parameters:
+* `-l | --log`: (_optional_) logger destination url as described by supported formats
+* `-c | --cfg`: (_optional_) hadoop configuration directory for NameNode HA resolution
+
+Environment Variables:
+* `HADOOP_CONF_DIR`: alternative to and takes precedence over the `-c | --cfg` command-line parameter
+
 License
 -------
 [MIT](http://mk23.mit-license.org/2015-2015/license.html)
