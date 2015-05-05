@@ -29,7 +29,7 @@ class WebHDFSClient(object):
 
         for part in ('hdfs', 'core'):
             try:
-                tree = ET.parse('%s/%s-site.xml' % (conf, part))
+                tree = ET.parse('%s/%s-site.xml' % (os.environ.get('HADOOP_CONF_DIR', conf), part))
                 name = tree.getroot().find('.//property/[name="dfs.ha.namenodes.%s"]/value' % url.hostname)
                 for item in name.text.split(','):
                     addr = tree.getroot().find('.//property/[name="dfs.namenode.http-address.%s.%s"]/value' % (url.hostname, item))
