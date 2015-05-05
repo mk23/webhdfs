@@ -49,35 +49,44 @@ class WebHDFSClient(object):
         args['user.name'] = self.user
 
         try:
-            u = '%s/webhdfs/v1/%s' % (self.base, path.lstrip('/'))
-            if not data:
-                r = getattr(requests, kind)(u, params=args)
-                self._log(r)
-                r.raise_for_status()
-                return r.json()
-            elif kind == 'put':
-                r = requests.put(u, params=args, allow_redirects=False)
-                self._log(r)
-                r.raise_for_status()
-                r = requests.put(r.headers['location'], headers={'content-type': 'application/octet-stream'}, data=data)
-                self._log(r)
-                r.raise_for_status()
-                return True
+            for indx, base in enumerate(self.urls):
+                try:
+                    u = '%s/webhdfs/v1/%s' % (base, path.lstrip('/'))
+                    if not data:
+                        r = getattr(requests, kind)(u, timeout=0.5, params=args)
+                        self._log(r)
+                        r.raise_for_status()
+                        return r.json()
+                    elif kind == 'put':
+                        r = requests.put(u, timeout=0.5, params=args, allow_redirects=False)
+                        self._log(r)
+                        r.raise_for_status()
+                        r = requests.put(r.headers['location'], headers={'content-type': 'application/octet-stream'}, data=data)
+                        self._log(r)
+                        r.raise_for_status()
+                        return True
+                    else:
+                        r = requests.get(u, timeout=0.5, params=args, stream=True)
+                        self._log(r)
+                        for c in r.iter_content(16 * 1024):
+                            data.write(c)
+                        r.raise_for_status()
+                        return True
+                except requests.exceptions.HTTPError as e:
+                    try:
+                        if e.response.json()['RemoteException']['exception'] == 'StandbyException':
+                            continue
+                        raise WebHDFSError(e.response.json()['RemoteException']['message'])
+                    except ValueError:
+                        raise WebHDFSError('%s: %s' % (e.response.reason, path))
+                except requests.exceptions.ConnectionError:
+                    continue
+                except requests.exceptions.Timeout:
+                    continue
             else:
-                r = requests.get(u, params=args, stream=True)
-                self._log(r)
-                for c in r.iter_content(16 * 1024):
-                    data.write(c)
-                r.raise_for_status()
-                return True
-        except requests.exceptions.ConnectionError as e:
-            raise WebHDFSError(e.message)
-        except requests.exceptions.HTTPError as e:
-            error = WebHDFSError('%s: %s' % (e.response.reason, path))
-            try:
-                error = WebHDFSError(e.response.json()['RemoteException']['message'])
-            finally:
-                raise error
+                raise WebHDFSError('cannot connect to any webhdfs endpoint')
+        finally:
+            self.urls = self.urls[indx:] + self.urls[:indx]
 
     def _log(self, rsp):
         LOG.debug('url:  %s', rsp.url)
