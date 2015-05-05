@@ -10,7 +10,7 @@ Table of Contents
 * [Installation](#installation)
 * [API](#api)
   * [WebHDFSClient](#webhdfsclient)
-    * [`__init__()`](#__init__base-user)
+    * [`__init__()`](#__init__base-user-confnone)
     * [`stat()`](#statpath)
     * [`ls()`](#lspath-recursefalse)
     * [`du()`](#dupath-realfalse)
@@ -69,16 +69,17 @@ All functions may throw a `WebHDFSError` exception:
 
 ## `WebHDFSClient` ##
 
-#### `__init__(base, user)` ####
+#### `__init__(base, user, conf=None)` ####
 Creates a new `WebHDFSClient` object
 
 Parameters:
 * `base`: base webhdfs url. (e.g. http://localhost:50070)
 * `user`: user name with which to access all resources
+* `conf`: (_optional_) path to hadoop configuration directory for NameNode HA resolution
 
 ```python
 >>> import getpass
->>> hdfs = WebHDFSClient('http://localhost:50070', getpass.getuser())
+>>> hdfs = WebHDFSClient('http://localhost:50070', getpass.getuser(), conf='/etc/hadoop/conf')
 ```
 
 #### `stat(path)` ####
