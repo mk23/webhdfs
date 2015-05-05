@@ -1,7 +1,10 @@
-import os
+import errno
 import logging
+import os
 import requests
 import tempfile
+import urlparse
+import xml.etree.cElementTree as ET
 
 from errors import WebHDFSError
 from attrib import WebHDFSObject
@@ -9,9 +12,37 @@ from attrib import WebHDFSObject
 LOG = logging.getLogger()
 
 class WebHDFSClient(object):
-    def __init__(self, base, user):
-        self.base = base
+    def __init__(self, base, user, conf=None):
         self.user = user
+        self._cfg(base, conf)
+
+
+    def _url(self, url):
+        if url.scheme == 'hdfs':
+            url = url._replace(scheme='http', netloc='%s:%s' % (url.hostname, url.port or '50070'))
+
+        return url.geturl()
+
+    def _cfg(self, base, conf=None):
+        url = urlparse.urlparse(base)
+        self.urls = []
+
+        for part in ('hdfs', 'core'):
+            try:
+                tree = ET.parse('%s/%s-site.xml' % (conf, part))
+                name = tree.getroot().find('.//property/[name="dfs.ha.namenodes.%s"]/value' % url.hostname)
+                for item in name.text.split(','):
+                    addr = tree.getroot().find('.//property/[name="dfs.namenode.http-address.%s.%s"]/value' % (url.hostname, item))
+                    self.urls.append(self._url(url._replace(netloc=addr.text)))
+                if self.urls:
+                    break
+            except EnvironmentError as e:
+                if e.errno == errno.ENOENT:
+                    continue
+                else:
+                    raise e
+        else:
+            self.urls.append(self._url(url))
 
     def _req(self, name, path, kind='get', data=None, **args):
         args['op']        = name
