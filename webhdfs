@@ -40,7 +40,7 @@ def create_log(logger=None):
     LOG.info('logging started')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='webhdfs shell')
+    parser = argparse.ArgumentParser(description='webhdfs shell', formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-l', '--log',
                         help='logger destination url')
     parser.add_argument('-c', '--cfg',
