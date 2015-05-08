@@ -10,7 +10,7 @@ Table of Contents
 * [Installation](#installation)
 * [API](#api)
   * [WebHDFSClient](#webhdfsclient)
-    * [`__init__()`](#__init__base-user-confnone)
+    * [`__init__()`](#__init__base-user-confnone-waitnone)
     * [`stat()`](#statpath)
     * [`ls()`](#lspath-recursefalse)
     * [`du()`](#dupath-realfalse)
@@ -69,17 +69,18 @@ All functions may throw a `WebHDFSError` exception:
 
 ## `WebHDFSClient` ##
 
-#### `__init__(base, user, conf=None)` ####
+#### `__init__(base, user, conf=None, wait=None)` ####
 Creates a new `WebHDFSClient` object
 
 Parameters:
 * `base`: base webhdfs url. (e.g. http://localhost:50070)
 * `user`: user name with which to access all resources
 * `conf`: (_optional_) path to hadoop configuration directory for NameNode HA resolution
+* `wait`: (_optional_) floating point number in seconds for request timeout waits
 
 ```python
 >>> import getpass
->>> hdfs = WebHDFSClient('http://localhost:50070', getpass.getuser(), conf='/etc/hadoop/conf')
+>>> hdfs = WebHDFSClient('http://localhost:50070', getpass.getuser(), conf='/etc/hadoop/conf', wait=1.5)
 ```
 
 #### `stat(path)` ####
@@ -334,17 +335,19 @@ True
 Usage
 -----
 ```
-usage: bin [-h] [-l LOG] [-c CFG] url
+usage: webhdfs [-h] [-l LOG] [-c CFG] [-t TIMEOUT] url
 
 webhdfs shell
 
 positional arguments:
-  url                webhdfs base url
+  url                   webhdfs base url
 
 optional arguments:
-  -h, --help         show this help message and exit
-  -l LOG, --log LOG  logger destination url
-  -c CFG, --cfg CFG  hdfs configuration dir
+  -h, --help            show this help message and exit
+  -l LOG, --log LOG     logger destination url
+  -c CFG, --cfg CFG     hdfs configuration dir
+  -t TIMEOUT, --timeout TIMEOUT
+                        request timeout in seconds
 
 supported logger formats:
   console://?level=LEVEL
@@ -357,6 +360,7 @@ supported logger formats:
 Parameters:
 * `-l | --log`: (_optional_) logger destination url as described by supported formats
 * `-c | --cfg`: (_optional_) hadoop configuration directory for NameNode HA resolution
+* `-t | --timeout`: (_optional_) request timeout in seconds as floating point number
 
 Environment Variables:
 * `HADOOP_CONF_DIR`: alternative to and takes precedence over the `-c | --cfg` command-line parameter
