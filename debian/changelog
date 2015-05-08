@@ -1,3 +1,17 @@
+webhdfs (1.0.3) stable; urgency=medium
+
+  * Tagging 1.0.3
+  * [d173bbc] Issue #6: Document API and shell timeout feature.
+  * [a799c64] Issue #6: Add wait parameter to WebHDFS shell.
+  * [026584e] Issue #6: Add wait parameter to the WebHDFS client.
+  * [19cb24d] Issue #7: Avoid crashing when given malformed xml to
+    parse.
+  * [8a036d4] Issue #5: Avoid crashing after failing to resolve
+    namenodes with given configuration. Instead uuse the supplied URL as
+    is.
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Fri, 08 May 2015 09:23:35 -0700
+
 webhdfs (1.0.2) stable; urgency=medium
 
   * Tagging 1.0.2
