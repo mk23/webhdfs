@@ -15,12 +15,12 @@ from attrib import LocalFSObject
 readline.set_completer_delims(readline.get_completer_delims().translate(None, '-'))
 
 class WebHDFSPrompt(cmd.Cmd):
-    def __init__(self, base, conf=None):
+    def __init__(self, base, conf=None, wait=None):
         cmd.Cmd.__init__(self)
 
         self.base = urlparse.urlparse(base)
         self.user = getpass.getuser()
-        self.hdfs = WebHDFSClient(base, self.user, conf)
+        self.hdfs = WebHDFSClient(base, self.user, conf, wait)
 
         self.cmds = dict((name[3:], False) for name in dir(self) if name.startswith('do_'))
         self.cmds.update({

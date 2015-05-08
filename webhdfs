@@ -45,6 +45,8 @@ if __name__ == '__main__':
                         help='logger destination url')
     parser.add_argument('-c', '--cfg',
                         help='hdfs configuration dir')
+    parser.add_argument('-t', '--timeout', type=float,
+                        help='request timeout in seconds')
     parser.add_argument('url',
                         help='webhdfs base url')
     parser.epilog = textwrap.dedent('''
@@ -59,6 +61,6 @@ if __name__ == '__main__':
     create_log(args.log)
 
     try:
-        WebHDFSPrompt(args.url, args.cfg).cmdloop()
+        WebHDFSPrompt(args.url, args.cfg, args.timeout).cmdloop()
     except KeyboardInterrupt:
         print
