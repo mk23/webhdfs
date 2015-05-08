@@ -47,6 +47,9 @@ class WebHDFSClient(object):
 
                 if self.urls:
                     break
+            except ET.ParseError:
+                LOG.debug('%s: failed to parse as xml', item)
+                continue
             except EnvironmentError as e:
                 if e.errno == errno.ENOENT:
                     LOG.debug('%s: file not found', item)
