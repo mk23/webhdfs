@@ -28,16 +28,28 @@ class WebHDFSClient(object):
         self.urls = []
 
         for part in ('hdfs', 'core'):
+            item = '%s/%s-site.xml' % (os.environ.get('HADOOP_CONF_DIR', conf), part)
+            LOG.debug('parsing %s for %s', item, url.hostname)
+
             try:
-                tree = ET.parse('%s/%s-site.xml' % (os.environ.get('HADOOP_CONF_DIR', conf), part))
-                name = tree.getroot().find('.//property/[name="dfs.ha.namenodes.%s"]/value' % url.hostname)
-                for item in name.text.split(','):
-                    addr = tree.getroot().find('.//property/[name="dfs.namenode.http-address.%s.%s"]/value' % (url.hostname, item))
-                    self.urls.append(self._url(url._replace(netloc=addr.text)))
+
+                tree = ET.parse(item).getroot()
+                name = tree.find('.//property/[name="dfs.ha.namenodes.%s"]/value' % url.hostname)
+
+                if name is None:
+                    continue
+
+                LOG.debug('found ha namenodes: %s', name.text)
+                for host in name.text.split(','):
+                    addr = tree.find('.//property/[name="dfs.namenode.http-address.%s.%s"]/value' % (url.hostname, host.strip()))
+                    self.urls.append(self._url(url._replace(netloc=addr.text.strip())))
+                    LOG.debug('resolved namenode address: %s -> %s', host.strip(), addr.text.strip())
+
                 if self.urls:
                     break
             except EnvironmentError as e:
                 if e.errno == errno.ENOENT:
+                    LOG.debug('%s: file not found', item)
                     continue
                 else:
                     raise e
