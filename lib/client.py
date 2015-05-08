@@ -12,8 +12,9 @@ from attrib import WebHDFSObject
 LOG = logging.getLogger()
 
 class WebHDFSClient(object):
-    def __init__(self, base, user, conf=None):
+    def __init__(self, base, user, conf=None, wait=None):
         self.user = user
+        self.wait = wait or 0.5
         self._cfg(base, conf)
 
 
@@ -68,12 +69,12 @@ class WebHDFSClient(object):
                 try:
                     u = '%s/webhdfs/v1/%s' % (base, path.lstrip('/'))
                     if not data:
-                        r = getattr(requests, kind)(u, timeout=0.5, params=args)
+                        r = getattr(requests, kind)(u, params=args, timeout=self.wait)
                         self._log(r)
                         r.raise_for_status()
                         return r.json()
                     elif kind == 'put':
-                        r = requests.put(u, timeout=0.5, params=args, allow_redirects=False)
+                        r = requests.put(u, params=args, allow_redirects=False, timeout=self.wait)
                         self._log(r)
                         r.raise_for_status()
                         r = requests.put(r.headers['location'], headers={'content-type': 'application/octet-stream'}, data=data)
@@ -81,7 +82,7 @@ class WebHDFSClient(object):
                         r.raise_for_status()
                         return True
                     else:
-                        r = requests.get(u, timeout=0.5, params=args, stream=True)
+                        r = requests.get(u, params=args, stream=True, timeout=self.wait)
                         self._log(r)
                         for c in r.iter_content(16 * 1024):
                             data.write(c)
