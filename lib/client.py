@@ -66,8 +66,8 @@ class WebHDFSClient(object):
 
         try:
             for indx, base in enumerate(self.urls):
+                u = '%s/webhdfs/v1/%s' % (base, path.lstrip('/'))
                 try:
-                    u = '%s/webhdfs/v1/%s' % (base, path.lstrip('/'))
                     if not data:
                         r = getattr(requests, kind)(u, params=args, timeout=self.wait)
                         self._log(r)
@@ -84,9 +84,9 @@ class WebHDFSClient(object):
                     else:
                         r = requests.get(u, params=args, stream=True, timeout=self.wait)
                         self._log(r)
+                        r.raise_for_status()
                         for c in r.iter_content(16 * 1024):
                             data.write(c)
-                        r.raise_for_status()
                         return True
                 except requests.exceptions.HTTPError as e:
                     try:
