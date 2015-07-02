@@ -15,7 +15,7 @@ from attrib import LocalFSObject
 readline.set_completer_delims(readline.get_completer_delims().translate(None, '-'))
 
 class WebHDFSPrompt(cmd.Cmd):
-    def __init__(self, base, conf=None, wait=None):
+    def __init__(self, base, conf=None, path=None, wait=None):
         cmd.Cmd.__init__(self)
 
         self.base = urlparse.urlparse(base)
@@ -29,7 +29,7 @@ class WebHDFSPrompt(cmd.Cmd):
             'put':  True,
         })
 
-        self.do_cd()
+        self.do_cd(path)
 
     def _list_dir(self, sources):
         objects = []

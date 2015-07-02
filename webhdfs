@@ -41,6 +41,8 @@ def create_log(logger=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='webhdfs shell', formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('-d', '--cwd',
+                        help='initial hdfs directory')
     parser.add_argument('-l', '--log',
                         help='logger destination url')
     parser.add_argument('-c', '--cfg',
@@ -61,6 +63,6 @@ if __name__ == '__main__':
     create_log(args.log)
 
     try:
-        WebHDFSPrompt(args.url, args.cfg, args.timeout).cmdloop()
+        WebHDFSPrompt(args.url, args.cfg, args.cwd, args.timeout).cmdloop()
     except KeyboardInterrupt:
         print

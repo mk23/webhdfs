@@ -344,6 +344,7 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
+  -d CWD, --cwd CWD     initial hdfs directory
   -l LOG, --log LOG     logger destination url
   -c CFG, --cfg CFG     hdfs configuration dir
   -t TIMEOUT, --timeout TIMEOUT
@@ -358,6 +359,7 @@ supported logger formats:
 ```
 
 Parameters:
+* `-d | --cwd`: (_optional_) initial hdfs directory to switch to on shell invocation
 * `-l | --log`: (_optional_) logger destination url as described by supported formats
 * `-c | --cfg`: (_optional_) hadoop configuration directory for NameNode HA resolution
 * `-t | --timeout`: (_optional_) request timeout in seconds as floating point number
