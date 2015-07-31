@@ -4,6 +4,7 @@ import os
 import pwd
 import readline
 import stat
+import sys
 import urlparse
 import zlib
 
@@ -15,7 +16,7 @@ from attrib import LocalFSObject
 readline.set_completer_delims(readline.get_completer_delims().translate(None, '-'))
 
 class WebHDFSPrompt(cmd.Cmd):
-    def __init__(self, base, conf=None, path=None, wait=None):
+    def __init__(self, base, conf=None, path=None, task=None, wait=None):
         cmd.Cmd.__init__(self)
 
         self.base = urlparse.urlparse(base)
@@ -28,6 +29,10 @@ class WebHDFSPrompt(cmd.Cmd):
             'lls':  True,
             'put':  True,
         })
+
+        if task:
+            self.onecmd(' '.join(task))
+            sys.exit(0)
 
         self.do_cd(path)
 

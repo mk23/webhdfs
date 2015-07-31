@@ -51,6 +51,8 @@ if __name__ == '__main__':
                         help='request timeout in seconds')
     parser.add_argument('url',
                         help='webhdfs base url')
+    parser.add_argument('cmd', nargs='*',
+                        help='run this command and exit')
     parser.epilog = textwrap.dedent('''
         supported logger formats:
           console://?level=LEVEL
@@ -63,6 +65,6 @@ if __name__ == '__main__':
     create_log(args.log)
 
     try:
-        WebHDFSPrompt(args.url, args.cfg, args.cwd, args.timeout).cmdloop()
+        WebHDFSPrompt(args.url, args.cfg, args.cwd, args.cmd, args.timeout).cmdloop()
     except KeyboardInterrupt:
         print
