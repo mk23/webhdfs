@@ -112,34 +112,52 @@ class WebHDFSClient(object):
         for k, v in sorted(rsp.headers.iteritems()):
             LOG.debug('  %%-%ds : %%s' % w, k, v)
 
+    def _fix(self, path):
+        rval = []
+
+        for part in path.split('/'):
+            if not part or part == '.':
+                continue
+            if rval and part == '..':
+                rval.pop()
+            else:
+                rval.append(part)
+
+        return '/'+'/'.join(rval)
+
     def stat(self, path):
         r = self._req('GETFILESTATUS', path)
         return WebHDFSObject(path, r['FileStatus'])
 
     def ls(self, path, recurse=False):
         l = []
-        r = self._req('LISTSTATUS', path)
+        p = self._fix(path)
+        r = self._req('LISTSTATUS', p)
         for i in r['FileStatuses']['FileStatus']:
-            l.append(WebHDFSObject(path, i))
+            l.append(WebHDFSObject(p, i))
             if recurse and l[-1].is_dir():
-                l.extend(self.ls('%s/%s' % (path, l[-1].name), recurse))
+                l.extend(self.ls('%s/%s' % (p, l[-1].name), recurse))
 
         return l
 
     def du(self, path, real=False):
-        r = self._req('GETCONTENTSUMMARY', path)
+        p = self._fix(path)
+        r = self._req('GETCONTENTSUMMARY', p)
         return r['ContentSummary']['length'] if not real else r['ContentSummary']['spaceConsumed']
 
     def mkdir(self, path):
-        r = self._req('MKDIRS', path, 'put')
+        p = self._fix(path)
+        r = self._req('MKDIRS', p, 'put')
         return r['boolean']
 
     def rm(self, path):
-        r = self._req('DELETE', path, 'delete')
+        p = self._fix(path)
+        r = self._req('DELETE', p, 'delete')
         return r['boolean']
 
     def repl(self, path, num):
-        r = self._req('SETREPLICATION', path, 'put', replication=num)
+        p = self._fix(path)
+        r = self._req('SETREPLICATION', p, 'put', replication=num)
         return r['boolean']
 
     def get(self, path, data=None):
@@ -148,11 +166,12 @@ class WebHDFSClient(object):
             rval = False
             data = tempfile.TemporaryFile()
 
-        self._req('OPEN', path, 'get', data=data)
+        p = self._fix(path)
+        self._req('OPEN', p, 'get', data=data)
 
         data.flush()
-        if os.fstat(data.fileno()).st_size != self.stat(path).size:
-            raise WebHDFSError('%s: download incomplete' % path)
+        if os.fstat(data.fileno()).st_size != self.stat(p).size:
+            raise WebHDFSError('%s: download incomplete' % p)
 
         if not rval:
             data.seek(0)
@@ -171,8 +190,9 @@ class WebHDFSClient(object):
             LOG.debug('%s: saved %d bytes to temp file', temp.name, len(data))
             data = temp
 
-        self._req('CREATE', path, 'put', data=data)
-        if os.fstat(data.fileno()).st_size != self.stat(path).size:
+        p = self._fix(path)
+        self._req('CREATE', p, 'put', data=data)
+        if os.fstat(data.fileno()).st_size != self.stat(p).size:
             raise WebHDFSError('%s: upload incomplete' % data.name)
 
         data.close()
