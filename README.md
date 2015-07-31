@@ -335,12 +335,13 @@ True
 Usage
 -----
 ```
-usage: webhdfs [-h] [-l LOG] [-c CFG] [-t TIMEOUT] url
+usage: webhdfs [-h] [-d CWD] [-l LOG] [-c CFG] [-t TIMEOUT] url [cmd [cmd ...]]
 
 webhdfs shell
 
 positional arguments:
   url                   webhdfs base url
+  cmd                   run this command and exit
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -359,6 +360,8 @@ supported logger formats:
 ```
 
 Parameters:
+* `url`: base url for the WebHDFS endpoint, supporting http, https, and hdfs schemes
+* `cmd`: (_optional_) run the specified command with args and exit without starting the shell
 * `-d | --cwd`: (_optional_) initial hdfs directory to switch to on shell invocation
 * `-l | --log`: (_optional_) logger destination url as described by supported formats
 * `-c | --cfg`: (_optional_) hadoop configuration directory for NameNode HA resolution
