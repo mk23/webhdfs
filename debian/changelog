@@ -1,3 +1,16 @@
+webhdfs (1.0.4) stable; urgency=medium
+
+  * Tagging 1.0.4
+  * [bfdfbeb] Issue #11: Sanitize paths in the client api.
+  * [1a4c117] Issue #9: Document one-shot command support.
+  * [15338ad] Issue #9: Add one-shot command support to the shell.
+  * [192f895] Issue #8: Add parameter for initial HDFS directory to
+    switch to on shell invocation.
+  * [d91d5d7] Issue #10: Call raise_for_status() earlier in fetch
+    requests to avoid masking http errors with other exceptions.
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Fri, 31 Jul 2015 14:58:16 -0700
+
 webhdfs (1.0.3) stable; urgency=medium
 
   * Tagging 1.0.3
