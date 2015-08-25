@@ -335,7 +335,8 @@ True
 Usage
 -----
 ```
-usage: webhdfs [-h] [-d CWD] [-l LOG] [-c CFG] [-t TIMEOUT] url [cmd [cmd ...]]
+usage: webhdfs [-h] [-d CWD] [-l LOG] [-c CFG] [-t TIMEOUT] [-v]
+               url [cmd [cmd ...]]
 
 webhdfs shell
 
@@ -350,6 +351,7 @@ optional arguments:
   -c CFG, --cfg CFG     hdfs configuration dir
   -t TIMEOUT, --timeout TIMEOUT
                         request timeout in seconds
+  -v, --version         print version and exit
 
 supported logger formats:
   console://?level=LEVEL
@@ -366,6 +368,7 @@ Parameters:
 * `-l | --log`: (_optional_) logger destination url as described by supported formats
 * `-c | --cfg`: (_optional_) hadoop configuration directory for NameNode HA resolution
 * `-t | --timeout`: (_optional_) request timeout in seconds as floating point number
+* `-v | --version`: (_optional_) print shell/library version and exit
 
 Environment Variables:
 * `HADOOP_CONF_DIR`: alternative to and takes precedence over the `-c | --cfg` command-line parameter
