@@ -232,7 +232,7 @@ class WebHDFSPrompt(cmd.Cmd):
             path = self._fix_path(path, required='cat')
             if self.hdfs.stat(path).is_dir():
                 raise WebHDFSError('%s: cannot cat directory' % path)
-            print self.hdfs.get(path)
+            sys.stdout.write(self.hdfs.get(path))
         except (WebHDFSError, OSError) as e:
             print e
 
@@ -241,7 +241,7 @@ class WebHDFSPrompt(cmd.Cmd):
             path = self._fix_path(path, required='zcat')
             if self.hdfs.stat(path).is_dir():
                 raise WebHDFSError('%s: cannot cat directory' % path)
-            print zlib.decompress(self.hdfs.get(path), 16 + zlib.MAX_WBITS)
+            sys.stdout.write(zlib.decompress(self.hdfs.get(path), 16 + zlib.MAX_WBITS))
         except (WebHDFSError, OSError) as e:
             print e
 
