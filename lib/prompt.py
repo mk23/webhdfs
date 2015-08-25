@@ -30,11 +30,11 @@ class WebHDFSPrompt(cmd.Cmd):
             'put':  True,
         })
 
+        self.do_cd(path)
+
         if task:
             self.onecmd(' '.join(task))
             sys.exit(0)
-
-        self.do_cd(path)
 
     def _list_dir(self, sources):
         objects = []
