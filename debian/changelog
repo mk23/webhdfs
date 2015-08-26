@@ -1,3 +1,15 @@
+webhdfs (1.0.5) stable; urgency=medium
+
+  * Tagging 1.0.5
+  * [8806313] Issue #15: add shell lsr (recursive ls) command.
+  * [8ecbdff] Issue #12: Use sys.stdout.write() instead of print for cat
+    and zcat commands.
+  * [0e88302] Issue #13: Document --version parameter.
+  * [8449498] Issue #13: Add --version parameter to shell script.
+  * [2ccb6bd] Issue #14: process cwd parameter before oneshot commands.
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Wed, 26 Aug 2015 09:05:57 -0700
+
 webhdfs (1.0.4) stable; urgency=medium
 
   * Tagging 1.0.4
