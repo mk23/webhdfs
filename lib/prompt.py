@@ -37,6 +37,7 @@ class WebHDFSPrompt(cmd.Cmd):
             sys.exit(0)
 
     def _list_dir(self, sources):
+        subdirs = []
         objects = []
         columns = ['mode', 'repl', 'owner', 'group', 'size', 'date', 'name']
         lengths = dict(zip(columns, [0] * len(columns)))
@@ -52,6 +53,9 @@ class WebHDFSPrompt(cmd.Cmd):
             if not stat.S_ISREG(item.perm) and not stat.S_ISDIR(item.perm):
                 continue
 
+            if stat.S_ISDIR(item.perm):
+                subdirs.append(item.name)
+
             tmp_obj = {}
 
             for name in columns:
@@ -65,6 +69,8 @@ class WebHDFSPrompt(cmd.Cmd):
         text = ' '.join('{%s:%s%s}' % (i, align.get(i, ''), lengths[i]) for i in columns)
         for item in objects:
             print text.format(**item)
+
+        return subdirs
 
     def _fix_path(self, path, local=False, required=False):
         path = '' if path is None else path.strip()
@@ -142,6 +148,16 @@ class WebHDFSPrompt(cmd.Cmd):
         try:
             path = self._fix_path(path)
             self._list_dir(self.hdfs.ls(path))
+        except WebHDFSError as e:
+            print e
+
+    def do_lsr(self, path=None):
+        try:
+            path = self._fix_path(path)
+            print path + ':'
+            for name in self._list_dir(self.hdfs.ls(path)):
+                print
+                self.do_lsr('%s/%s' % (path, name))
         except WebHDFSError as e:
             print e
 
