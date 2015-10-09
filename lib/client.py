@@ -1,4 +1,5 @@
 import errno
+import fnmatch
 import logging
 import os
 import requests
@@ -137,6 +138,27 @@ class WebHDFSClient(object):
             l.append(WebHDFSObject(p, i))
             if recurse and l[-1].is_dir():
                 l.extend(self.ls('%s/%s' % (p, l[-1].name), recurse))
+
+        return l
+
+    def glob(self, path):
+        l = ['']
+        p = self._fix(path)
+        c = p.lstrip('/').split('/')
+        for i, n in enumerate(c):
+            d = []
+            for t in l:
+                r = self._req('LISTSTATUS', t)
+                for f in r['FileStatuses']['FileStatus']:
+                    if fnmatch.fnmatch(f['pathSuffix'], n):
+                        if i == len(c) - 1:
+                            d.append(WebHDFSObject(t, f))
+                        elif f['type'] == 'DIRECTORY':
+                            d.append('%s/%s' % (t, f['pathSuffix']))
+            l = d
+
+        if not l:
+            raise WebHDFSError('%s: no matching file or directory' % p)
 
         return l
 
