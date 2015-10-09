@@ -1,3 +1,13 @@
+webhdfs (1.0.6) stable; urgency=medium
+
+  * Tagging 1.0.6
+  * [29befa2] Issue #17: Add glob command to the shell.
+  * [b96b39d] Issue #16: Document glob() API function.
+  * [5fcb0be] Issue #16: Add glob() API call to return HDFS objects
+    matching requested pattern.
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Fri, 09 Oct 2015 10:01:10 -0700
+
 webhdfs (1.0.5) stable; urgency=medium
 
   * Tagging 1.0.5
