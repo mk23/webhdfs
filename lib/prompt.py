@@ -151,6 +151,13 @@ class WebHDFSPrompt(cmd.Cmd):
         except WebHDFSError as e:
             print e
 
+    def do_glob(self, path=None):
+        try:
+            path = self._fix_path(path, required='glob')
+            self._list_dir(self.hdfs.glob(path))
+        except WebHDFSError as e:
+            print e
+
     def do_lsr(self, path=None):
         try:
             path = self._fix_path(path)
