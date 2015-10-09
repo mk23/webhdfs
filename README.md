@@ -13,6 +13,7 @@ Table of Contents
     * [`__init__()`](#__init__base-user-confnone-waitnone)
     * [`stat()`](#statpath)
     * [`ls()`](#lspath-recursefalse)
+    * [`glob()`](#globpath)
     * [`du()`](#dupath-realfalse)
     * [`mkdir()`](#mkdirpath)
     * [`rm()`](#rmpath)
@@ -117,6 +118,26 @@ Returns:
 
 ```python
 >>> l = hdfs.ls('/')
+>>> print l[0].full
+/user
+>>> print l[0].kind
+DIRECTORY
+```
+
+
+#### `glob(path` ####
+Lists a specified HDFS path pattern.  Uses this WebHDFS REst request:
+
+    GET <BASE>/webhdfs/v1/<PATH>?op=LISTSTATUS
+
+Parameters:
+* `path`: HDFS path pattern to list
+
+Returns:
+* List of [`WebHDFSObject`](#webhdfsobject) objects for the specified pattern.
+
+```python
+>>> l = hdfs.glob('/us*')
 >>> print l[0].full
 /user
 >>> print l[0].kind
