@@ -7,7 +7,7 @@ import tempfile
 import urlparse
 import xml.etree.cElementTree as ET
 
-from errors import WebHDFSError
+from errors import WebHDFSError, WebHDFSConnectionError, WebHDFSFileNotFoundError, WebHDFSIncompleteTransferError
 from attrib import WebHDFSObject
 
 LOG = logging.getLogger()
@@ -93,7 +93,7 @@ class WebHDFSClient(object):
                     try:
                         if e.response.json()['RemoteException']['exception'] == 'StandbyException':
                             continue
-                        raise WebHDFSError(e.response.json()['RemoteException']['message'])
+                        raise WebHDFSError(e.response.json())
                     except ValueError:
                         raise WebHDFSError('%s: %s' % (e.response.reason, path))
                 except requests.exceptions.ConnectionError:
@@ -101,7 +101,7 @@ class WebHDFSClient(object):
                 except requests.exceptions.Timeout:
                     continue
             else:
-                raise WebHDFSError('cannot connect to any webhdfs endpoint')
+                raise WebHDFSConnectionError('cannot connect to any webhdfs endpoint')
         finally:
             self.urls = self.urls[indx:] + self.urls[:indx]
 
@@ -158,7 +158,7 @@ class WebHDFSClient(object):
             l = d
 
         if not l:
-            raise WebHDFSError('%s: no matching file or directory' % p)
+            raise WebHDFSFileNotFoundError('%s: no matching file or directory' % p)
 
         return l
 
@@ -199,7 +199,7 @@ class WebHDFSClient(object):
 
         data.flush()
         if os.fstat(data.fileno()).st_size != self.stat(p).size:
-            raise WebHDFSError('%s: download incomplete' % p)
+            raise WebHDFSIncompleteTransferError('%s: download incomplete' % p)
 
         if not rval:
             data.seek(0)
@@ -221,7 +221,7 @@ class WebHDFSClient(object):
         p = self._fix(path)
         self._req('CREATE', p, 'put', data=data)
         if os.fstat(data.fileno()).st_size != self.stat(p).size:
-            raise WebHDFSError('%s: upload incomplete' % data.name)
+            raise WebHDFSIncompleteTransferError('%s: upload incomplete' % data.name)
 
         data.close()
         return True
