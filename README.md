@@ -211,8 +211,12 @@ Returns:
 * Boolean `True` on success, `False` otherwise
 
 ```python
->>> hdfs.rm('/user/%s/test' % getpass.getuser())
+>>> hdfs.stat('/user/%s/test' % getpass.getuser()).repl
+1
+>>> hdfs.repl('/user/%s/test' % getpass.getuser(), 3).repl
 True
+>>> hdfs.stat('/user/%s/test' % getpass.getuser()).repl
+3
 ```
 
 
