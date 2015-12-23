@@ -172,6 +172,12 @@ class WebHDFSClient(object):
         r = self._req('MKDIRS', p, 'put')
         return r['boolean']
 
+    def mv(self, path, dest):
+        p = self._fix(path)
+        d = self._fix(dest)
+        r = self._req('RENAME', p, 'put', destination=d)
+        return r['boolean']
+
     def rm(self, path):
         p = self._fix(path)
         r = self._req('DELETE', p, 'delete')
