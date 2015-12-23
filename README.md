@@ -16,6 +16,7 @@ Table of Contents
     * [`glob()`](#globpath)
     * [`du()`](#dupath-realfalse)
     * [`mkdir()`](#mkdirpath)
+    * [`mv()`](#mvpath-dest)
     * [`rm()`](#rmpath)
     * [`repl()`](#replpath-num)
     * [`get()`](#getpath-datanone)
@@ -178,6 +179,26 @@ Returns:
 ```python
 >>> hdfs.mkdir('/user/%s/test' % getpass.getuser())
 True
+```
+
+
+#### `mv(path, dest)` ####
+Moves/renames the specified HDFS path to specified destination.  Uses this WebHDFS rest request:
+
+    PUT <BASE>/webhdfs/v1/<PATH>?op=RENAME&destination=<DEST>
+
+Parameters:
+* `path`: HDFS path to move/rename
+* `dest`: Destination path
+
+Returns:
+* Boolean `True` on success and `False` on error
+
+```python
+>>> hdfs.mv('/user/%s/test' % getpass.getuser(), '/user/%s/test.old' % getpass.getuser())
+True
+>>> hdfs.mv('/user/%s/test.old' % getpass.getuser(), '/some/non-existant/path')
+False
 ```
 
 
