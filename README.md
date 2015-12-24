@@ -64,10 +64,18 @@ To use the WebHDFS Client API, start by importing the class from the module
 >>> from webhdfs import WebHDFSClient
 ```
 
-All functions may throw a `WebHDFSError` exception:
-* URL is not reachable
-* Requested path is not found
-* Specified user has no permission to requested path
+All functions may throw a `WebHDFSError` exception or one of these subclasses:
+
+| Exception Type                   | Remote Exception              | Description                                |
+|----------------------------------|-------------------------------|--------------------------------------------|
+| WebHDFSConnectionError           |                               | Unable to connect to active NameNode       |
+| WebHDFSIncompleteTransferError   |                               | Transferred file doesn't match origin size |
+| WebHDFSAccessControlError        | AccessControlException        | Access to specified path denied            |
+| WebHDFSIllegalArgumentError      | IllegalArgumentException      | Invalid parameter value                    |
+| WebHDFSFileNotFoundError         | FileNotFoundException         | Specified path does not exist              |
+| WebHDFSSecurityError             | SecurityException             | Failed to obtain user/group information    |
+| WebHDFSUnsupportedOperationError | UnsupportedOperationException | Requested operation is not implemented     |
+| WebHDFSUnknownRemoteError        |                               | Remote exception unrecognized              |
 
 ## `WebHDFSClient` ##
 
