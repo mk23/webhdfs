@@ -20,6 +20,7 @@ Table of Contents
     * [`rm()`](#rmpath)
     * [`repl()`](#replpath-num)
     * [`get()`](#getpath-datanone)
+    * [`put()`](#putpath-data)
   * [WebHDFSObject](#webhdfsobject)
     * [`__init__()`](#__init__path-bits)
     * [`is_dir()`](#is_dir)
@@ -134,7 +135,7 @@ DIRECTORY
 ```
 
 
-#### `glob(path` ####
+#### `glob(path)` ####
 Lists a specified HDFS path pattern.  Uses this WebHDFS REst request:
 
     GET <BASE>/webhdfs/v1/<PATH>?op=LISTSTATUS
@@ -261,6 +262,25 @@ Parameters:
 Returns:
 * Boolean `True` if data is set and written file size matches source
 * String contents of the fetched file if data is None
+
+Raises:
+* `WebHDFSIncompleteTransferError`
+
+
+#### `put(path, data)` ####
+Creates the specified HDFS file using the contents of a file open for read, or value of the string.  Uses this WebHDFS request:
+
+    PUT <BASE>/webhdfs/v1/<PATH>?op=CREATE
+
+Parameters:
+* `path`: HDFS path to fetch
+* `data`: file-like object open for read or string
+
+Returns:
+* Boolean `True` if written file size matches source
+
+Raises:
+* `WebHDFSIncompleteTransferError`
 
 
 ## `WebHDFSObject` ##
