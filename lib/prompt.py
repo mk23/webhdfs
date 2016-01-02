@@ -2,7 +2,9 @@ import cmd
 import getpass
 import os
 import pwd
+import re
 import readline
+import shlex
 import stat
 import sys
 import textwrap
@@ -23,13 +25,6 @@ class WebHDFSPrompt(cmd.Cmd):
         self.base = urlparse.urlparse(base)
         self.user = getpass.getuser()
         self.hdfs = WebHDFSClient(base, self.user, conf, wait)
-
-        self.cmds = dict((name[3:], False) for name in dir(self) if name.startswith('do_'))
-        self.cmds.update({
-            'lcd':  True,
-            'lls':  True,
-            'put':  True,
-        })
 
         self.do_cd(path)
 
@@ -77,10 +72,11 @@ class WebHDFSPrompt(cmd.Cmd):
         path = '' if path is None else path.strip()
         rval = []
 
-        if not path and not required:
-            path = getattr(self, 'path', '/user/%s' % self.user) if not local else os.getcwd()
-        elif not path and required:
+        if not path and required:
             raise WebHDFSError('%s: path not specified' % required)
+
+        if not path:
+            path = getattr(self, 'path', '/user/%s' % self.user) if not local else os.getcwd()
 
         if not path.startswith('/'):
             path = '%s/%s' % (self.path if not local else os.getcwd(), path)
@@ -98,31 +94,59 @@ class WebHDFSPrompt(cmd.Cmd):
     def _reset_prompt(self):
         self.prompt = '%s@%s r:%s l:%s> ' % (self.user, self.base.netloc, self.path, os.getcwd())
 
+    def _complete_local(self, part, kind):
+        path = self._fix_path(part, local=True)
+        name = ''
+
+        if part and not part.endswith('/'):
+            name = os.path.basename(path)
+            path = os.path.dirname(path)
+
+        if kind == 'file':
+            pick = lambda x: x.startswith(name) and not stat.S_ISDIR(os.stat('%s/%s' % (path, x)).st_mode)
+        elif kind == 'dir':
+            pick = lambda x: x.startswith(name) and stat.S_ISDIR(os.stat('%s/%s' % (path, x)).st_mode)
+        else:
+            pick = lambda x: x.startswith(name)
+
+        return [i + ('/' if stat.S_ISDIR(os.stat('%s/%s' % (path, i)).st_mode) else ' ') for i in os.listdir(path) if pick(i)]
+
+    def _complete_remote(self, part, kind):
+        path = self._fix_path(part)
+        name = ''
+
+        if part and not part.endswith('/') and not part.endswith('/..'):
+            name = os.path.basename(path)
+            path = os.path.dirname(path)
+
+        if kind == 'file':
+            pick = lambda x: x.name.startswith(name) and not x.is_dir()
+        elif kind == 'dir':
+            pick = lambda x: x.name.startswith(name) and x.is_dir()
+        else:
+            pick = lambda x: x.name.startswith(name)
+
+        return [i.name + ('/' if i.is_dir() else ' ') for i in self.hdfs.ls(path, request=pick)]
+
+    def completedefault(self, part, line, s, e):
+        if part == '.' or part == '..':
+            return [part + '/']
+
+        args = shlex.split(line[:e])
+        if len(args) == 1 or line[e - 1] == ' ':
+            args.append('')
+
+        # Extract completion magic from method documentation
+        docs = getattr(getattr(self, 'do_'+args[0], object), '__doc__')
+        rule = re.findall(r'(?:<(local|remote) (file/dir|file|dir)>)+', docs)[len(args) - 2]
+
+        return getattr(self, '_complete_'+rule[0])(args[-1], rule[1])
+
     def emptyline(self):
         pass
 
     def default(self, arg):
         print '%s: unknown command' % arg
-
-    def completedefault(self, _1, line, _2, _3):
-        name = line.split(None, 1)[0]
-        if name not in self.cmds:
-            return []
-
-        part = line[len(name) + 1:]
-        path = os.path.dirname(part)
-
-        try:
-            if self.cmds[name]:
-                if not path.startswith('/'):
-                    path = '%s/%s' % (os.getcwd(), path)
-                return [i + ('/' if stat.S_ISDIR(os.stat(i).st_mode) else ' ') for i in os.listdir(os.path.dirname(path)) if i.startswith(os.path.basename(part))]
-            else:
-                if not path.startswith('/'):
-                    path = '%s/%s' % (self.path, path)
-                return [i.name + ('/' if i.is_dir() else ' ') for i in self.hdfs.ls(path) if i.name.startswith(os.path.basename(part))]
-        except (WebHDFSError, OSError):
-            return []
 
     def do_cd(self, path=None):
         '''
