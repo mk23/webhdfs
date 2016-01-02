@@ -12,7 +12,7 @@ Table of Contents
   * [WebHDFSClient](#webhdfsclient)
     * [`__init__()`](#__init__base-user-confnone-waitnone)
     * [`stat()`](#statpath)
-    * [`ls()`](#lspath-recursefalse)
+    * [`ls()`](#lspath-recursefalse-requestfalse)
     * [`glob()`](#globpath)
     * [`du()`](#dupath-realfalse)
     * [`mkdir()`](#mkdirpath)
@@ -114,7 +114,7 @@ DIRECTORY
 ```
 
 
-#### `ls(path, recurse=False)` ####
+#### `ls(path, recurse=False, request=False)` ####
 Lists a specified HDFS path.  Uses this WebHDFS REst request:
 
     GET <BASE>/webhdfs/v1/<PATH>?op=LISTSTATUS
@@ -122,6 +122,7 @@ Lists a specified HDFS path.  Uses this WebHDFS REst request:
 Parameters:
 * `path`: HDFS path to list
 * `recurse`: (_optional_) descend down the directory tree
+* `request`: (_optional_) filter request callback for each returned object
 
 Returns:
 * List of children [`WebHDFSObject`](#webhdfsobject) objects for the specified path, if it is a directory or a list of a single item otherwise.
@@ -132,6 +133,9 @@ Returns:
 /user
 >>> print l[0].kind
 DIRECTORY
+>>> l = hdfs.ls('/user', request=lambda x: x.name.startswith('m'))
+>>> print l[0].full
+/user/max
 ```
 
 
@@ -290,7 +294,7 @@ Creates a new `WebHDFSObject` object
 
 Parameters:
 * `path`: HDFS path prefix
-* `bits`: dictionary as returned by [`stat()`](#statpath) or [`ls()`](#lspath-recursefalse) call.
+* `bits`: dictionary as returned by [`stat()`](#statpath) or [`ls()`](#lspath-recursefalse-requestfalse) call.
 
 ```python
 >>> o = hdfs.stat('/')
