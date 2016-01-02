@@ -11,7 +11,7 @@ Table of Contents
 * [API](#api)
   * [WebHDFSClient](#webhdfsclient)
     * [`__init__()`](#__init__base-user-confnone-waitnone)
-    * [`stat()`](#statpath)
+    * [`stat()`](#statpath-catchfalse)
     * [`ls()`](#lspath-recursefalse-requestfalse)
     * [`glob()`](#globpath)
     * [`du()`](#dupath-realfalse)
@@ -94,16 +94,18 @@ Parameters:
 >>> hdfs = WebHDFSClient('http://localhost:50070', getpass.getuser(), conf='/etc/hadoop/conf', wait=1.5)
 ```
 
-#### `stat(path)` ####
+#### `stat(path, catch=False)` ####
 Retrieves metadata about the specified HDFS item.  Uses this WebHDFS REst request:
 
     GET <BASE>/webhdfs/v1/<PATH>?op=GETFILESTATUS
 
 Parameters:
 * `path`: HDFS path to fetch
+* `catch`: (_optional_) trap `WebHDFSFileNotFoundError` instead of raising the exception
 
 Returns:
 * A single [`WebHDFSObject`](#webhdfsobject) object for the specified path.
+* `False` if object not found in HDFS and `catch=True`.
 
 ```python
 >>> o = hdfs.stat('/user')
@@ -111,6 +113,9 @@ Returns:
 /user
 >>> print o.kind
 DIRECTORY
+>>> o = hdfs.stat('/foo', catch=True)
+>>> print o
+False
 ```
 
 
@@ -294,7 +299,7 @@ Creates a new `WebHDFSObject` object
 
 Parameters:
 * `path`: HDFS path prefix
-* `bits`: dictionary as returned by [`stat()`](#statpath) or [`ls()`](#lspath-recursefalse-requestfalse) call.
+* `bits`: dictionary as returned by [`stat()`](#statpath-catchfalse) or [`ls()`](#lspath-recursefalse-requestfalse) call.
 
 ```python
 >>> o = hdfs.stat('/')
