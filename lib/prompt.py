@@ -193,11 +193,7 @@ class WebHDFSPrompt(cmd.Cmd):
     def do_mkdir(self, path):
         try:
             path = self._fix_path(path, required='mkdir')
-            try:
-                self.hdfs.stat(path)
-            except WebHDFSError as e:
-                pass
-            else:
+            if self.hdfs.stat(path, catch=True):
                 raise WebHDFSError('%s: already exists' % path)
             self.hdfs.mkdir(path)
         except WebHDFSError as e:
@@ -240,11 +236,7 @@ class WebHDFSPrompt(cmd.Cmd):
             dest = '%s/%s' % (self.path, os.path.basename(path))
             if stat.S_ISDIR(os.stat(path).st_mode):
                 raise WebHDFSError('%s: cannot upload directory' % path)
-            try:
-                self.hdfs.stat(dest)
-            except WebHDFSError as e:
-                pass
-            else:
+            if self.hdfs.stat(dest, catch=True):
                 raise WebHDFSError('%s: already exists' % dest)
             self.hdfs.put(dest, data=open(path, 'r'))
         except (WebHDFSError, OSError) as e:
