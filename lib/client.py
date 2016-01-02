@@ -126,9 +126,15 @@ class WebHDFSClient(object):
 
         return '/'+'/'.join(rval)
 
-    def stat(self, path):
-        r = self._req('GETFILESTATUS', path)
-        return WebHDFSObject(path, r['FileStatus'])
+    def stat(self, path, catch=False):
+        try:
+            r = self._req('GETFILESTATUS', path)
+            return WebHDFSObject(path, r['FileStatus'])
+        except WebHDFSFileNotFoundError as e:
+            if not catch:
+                raise e
+
+        return False
 
     def ls(self, path, recurse=False, request=False):
         l = []
