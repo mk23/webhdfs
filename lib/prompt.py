@@ -5,6 +5,7 @@ import pwd
 import readline
 import stat
 import sys
+import textwrap
 import urlparse
 import zlib
 
@@ -124,6 +125,11 @@ class WebHDFSPrompt(cmd.Cmd):
             return []
 
     def do_cd(self, path=None):
+        '''
+            Usage: cd <remote dir>
+
+            Changes the shell remote directory
+        '''
         try:
             path = self._fix_path(path or '/user/%s' % self.user)
             if not self.hdfs.stat(path).is_dir():
@@ -136,6 +142,11 @@ class WebHDFSPrompt(cmd.Cmd):
             self._reset_prompt()
 
     def do_lcd(self, path=None):
+        '''
+            Usage: lcd <local dir>
+
+            Changes the shell local directory
+        '''
         try:
             path = self._fix_path(path or pwd.getpwnam(self.user).pw_dir, local=True)
             os.chdir(path)
@@ -145,20 +156,23 @@ class WebHDFSPrompt(cmd.Cmd):
             self._reset_prompt()
 
     def do_ls(self, path=None):
+        '''
+            Usage: ls <remote file/dir>
+
+            Lists remote file or directory
+        '''
         try:
             path = self._fix_path(path)
             self._list_dir(self.hdfs.ls(path))
         except WebHDFSError as e:
             print e
 
-    def do_glob(self, path=None):
-        try:
-            path = self._fix_path(path, required='glob')
-            self._list_dir(self.hdfs.glob(path))
-        except WebHDFSError as e:
-            print e
-
     def do_lsr(self, path=None):
+        '''
+            Usage: ls <remote file/dir>
+
+            Lists remote file or directory recursively
+        '''
         try:
             path = self._fix_path(path)
             print path + ':'
@@ -168,7 +182,24 @@ class WebHDFSPrompt(cmd.Cmd):
         except WebHDFSError as e:
             print e
 
+    def do_glob(self, path=None):
+        '''
+            Usage: glob <remote file/dir>
+
+            Lists remote file or directory pattern
+        '''
+        try:
+            path = self._fix_path(path, required='glob')
+            self._list_dir(self.hdfs.glob(path))
+        except WebHDFSError as e:
+            print e
+
     def do_lls(self, path=None):
+        '''
+            Usage: lls <local file/dir>
+
+            Lists local file or directory
+        '''
         try:
             path = self._fix_path(path, local=True)
             info = os.stat(path)
@@ -184,6 +215,11 @@ class WebHDFSPrompt(cmd.Cmd):
             print e
 
     def do_du(self, path=None):
+        '''
+            Usage: du <remote file/dir>
+
+            Displays disk usage for remote file or directory
+        '''
         try:
             path = self._fix_path(path)
             print self.hdfs.du(path)
@@ -191,6 +227,11 @@ class WebHDFSPrompt(cmd.Cmd):
             print e
 
     def do_mkdir(self, path):
+        '''
+            Usage: mkdir <remote dir>
+
+            Creates remote directory
+        '''
         try:
             path = self._fix_path(path, required='mkdir')
             if self.hdfs.stat(path, catch=True):
@@ -200,6 +241,11 @@ class WebHDFSPrompt(cmd.Cmd):
             print e
 
     def do_rm(self, path):
+        '''
+            Usage: rm <remote file>
+
+            Removes remote file
+        '''
         try:
             path = self._fix_path(path, required='rm')
             if self.hdfs.stat(path).is_dir():
@@ -209,6 +255,11 @@ class WebHDFSPrompt(cmd.Cmd):
             print e
 
     def do_rmdir(self, path):
+        '''
+            Usage: rm <remote dir>
+
+            Removes remote directory
+        '''
         try:
             path = self._fix_path(path, required='rmdir')
             if not self.hdfs.stat(path).is_dir():
@@ -220,6 +271,11 @@ class WebHDFSPrompt(cmd.Cmd):
             print e
 
     def do_get(self, path):
+        '''
+            Usage: get <remote file>
+
+            Fetch remote file into current local directory
+        '''
         try:
             path = self._fix_path(path, required='get')
             if self.hdfs.stat(path).is_dir():
@@ -231,6 +287,11 @@ class WebHDFSPrompt(cmd.Cmd):
             print e
 
     def do_put(self, path):
+        '''
+            Usage: put <local file>
+
+            Upload local file into current remote directory
+        '''
         try:
             path = self._fix_path(path, local=True, required='put')
             dest = '%s/%s' % (self.path, os.path.basename(path))
@@ -243,6 +304,11 @@ class WebHDFSPrompt(cmd.Cmd):
             print e
 
     def do_cat(self, path):
+        '''
+            Usage: cat <remote file>
+
+            Display contents of remote file
+        '''
         try:
             path = self._fix_path(path, required='cat')
             if self.hdfs.stat(path).is_dir():
@@ -252,6 +318,11 @@ class WebHDFSPrompt(cmd.Cmd):
             print e
 
     def do_zcat(self, path):
+        '''
+            Usage: zcat <remote file>
+
+            Display contents of compressed remote file
+        '''
         try:
             path = self._fix_path(path, required='zcat')
             if self.hdfs.stat(path).is_dir():
@@ -263,3 +334,7 @@ class WebHDFSPrompt(cmd.Cmd):
     def do_EOF(self, line):
         print
         return True
+
+for name, func in vars(WebHDFSPrompt).items():
+    if name.startswith('do_') and getattr(func, '__doc__'):
+        func.__doc__ = textwrap.dedent(func.__doc__).strip()
