@@ -264,6 +264,26 @@ class WebHDFSPrompt(cmd.Cmd):
         except WebHDFSError as e:
             print e
 
+    def do_mv(self, args):
+        '''
+            Usage: mv <remote file/dir> <remote dir>
+
+            Moves/renames remote file or directory
+        '''
+        try:
+            path, dest = shlex.split(args)
+            path = self._fix_path(path, required='mv')
+            dest = self._fix_path(dest, required='mv')
+            stat = self.hdfs.stat(dest, catch=True) or self.hdfs.stat(os.path.dirname(dest), catch=True)
+            if stat and not stat.is_dir():
+                raise WebHDFSError('%s: invalid destination' % dest)
+            if not self.hdfs.mv(path, dest):
+                raise WebHDFSError('%s: failed to move/rename' % path)
+        except WebHDFSError as e:
+            print e
+        except ValueError as e:
+            print 'Usage: mv <source> <target>'
+
     def do_rm(self, path):
         '''
             Usage: rm <remote file>
