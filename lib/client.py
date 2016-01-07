@@ -137,15 +137,15 @@ class WebHDFSClient(object):
         return False
 
     def ls(self, path, recurse=False, request=False):
-        l = []
         p = self._fix(path)
         r = self._req('LISTSTATUS', p)
         for i in r['FileStatuses']['FileStatus']:
-            l.append(WebHDFSObject(p, i))
-            if recurse and l[-1].is_dir():
-                l.extend(self.ls('%s/%s' % (p, l[-1].name), recurse))
-
-        return [i for i in l if not callable(request) or request(i)]
+            o = WebHDFSObject(p, i)
+            if not callable(request) or request(o):
+                yield o
+                if recurse and o.is_dir():
+                    for o in self.ls('%s/%s' % (p, o.name), recurse):
+                        yield o
 
     def glob(self, path):
         l = ['']
