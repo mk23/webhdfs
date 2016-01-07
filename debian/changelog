@@ -1,3 +1,44 @@
+webhdfs (1.0.7) stable; urgency=medium
+
+  * Tagging 1.0.7
+  * [e1f5794] Issue #28: Update rmdir shell command to use is_empty()
+    since ls() now always returns a generator which is a boolean True.
+    (Max Kalika)
+  * [2f19a76] Issue #27: Document is_empty() attribute API call. (Max
+    Kalika)
+  * [fee918c] Issue #27: Add is_empty() attribute call for files and
+    directories. (Max Kalika)
+  * [8f51620] Issue #28: Document ls() API call change to generator.
+    (Max Kalika)
+  * [a99da8e] Issue #28: convert ls() API call to a generator. (Max
+    Kalika)
+  * [66c8175] Issue #26: Update license year. (Max Kalika)
+  * [86bbfb7] Issue #19: Add shell mv command. (Max Kalika)
+  * [22938e7] Issue #24: Rewrite completion to use help docs usage
+    patterns to automatically determine source and limits. (Max Kalika)
+  * [2397ffc] Issue #23: Add help documentation to shell commands. (Max
+    Kalika)
+  * [c99a906] Issue #22: Simplify object existence tests in shell by
+    using new stat() API catch parameter. (Max Kalika)
+  * [68138e5] Issue #22: Document stat() API function catch parameter.
+    (Max Kalika)
+  * [b35620d] Issue #22: Add catch parameter to stat() API call to
+    return False on WebHDFSFileNotFoundError instead of raising the
+    exception. (Max Kalika)
+  * [ff9897f] Issue #25: Document ls() API function request callback
+    parameter. (Max Kalika)
+  * [6e36fee] Issue #25: Add filtering callback to ls() API call. (Max
+    Kalika)
+  * [66f5eb1] Issue #21: Document put() API function. (Max Kalika)
+  * [0534af1] Issue #20: Document new error types. (Max Kalika)
+  * [3b7aba5] Issue #20: Add and use specific error types. (Max Kalika)
+  * [895bc46] Issue #19: Document mv() API function. (Max Kalika)
+  * [a2f2ee4] Issue #19: Add mv() API call to move/rename HDFS objects.
+    (Max Kalika)
+  * [fe2f916] Issue #18: Fix repl() documentation. (Max Kalika)
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Thu, 07 Jan 2016 10:12:53 -0800
+
 webhdfs (1.0.6) stable; urgency=medium
 
   * Tagging 1.0.6
