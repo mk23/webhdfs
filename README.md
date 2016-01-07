@@ -130,15 +130,15 @@ Parameters:
 * `request`: (_optional_) filter request callback for each returned object
 
 Returns:
-* List of children [`WebHDFSObject`](#webhdfsobject) objects for the specified path, if it is a directory or a list of a single item otherwise.
+* Generator producing children [`WebHDFSObject`](#webhdfsobject) objects for the specified path.
 
 ```python
->>> l = hdfs.ls('/')
+>>> l = list(hdfs.ls('/')) # must convert to list if referencing by index
 >>> print l[0].full
 /user
 >>> print l[0].kind
 DIRECTORY
->>> l = hdfs.ls('/user', request=lambda x: x.name.startswith('m'))
+>>> l = list(hdfs.ls('/user', request=lambda x: x.name.startswith('m')))
 >>> print l[0].full
 /user/max
 ```
