@@ -306,9 +306,10 @@ class WebHDFSPrompt(cmd.Cmd):
         '''
         try:
             path = self._fix_path(path, required='rmdir')
-            if not self.hdfs.stat(path).is_dir():
+            temp = self.hdfs.stat(path)
+            if not temp.is_dir():
                 raise WebHDFSError('%s: not a directory' % path)
-            if self.hdfs.ls(path):
+            if not temp.is_empty():
                 raise WebHDFSError('%s: directory not empty' % path)
             self.hdfs.rm(path)
         except WebHDFSError as e:
