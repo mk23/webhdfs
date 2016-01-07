@@ -24,6 +24,7 @@ Table of Contents
   * [WebHDFSObject](#webhdfsobject)
     * [`__init__()`](#__init__path-bits)
     * [`is_dir()`](#is_dir)
+    * [`is_empty()`](#is_empty)
     * [`owner`](#owner)
     * [`group`](#group)
     * [`name`](#name)
@@ -320,6 +321,21 @@ Returns:
 >>> o.is_dir()
 True
 ```
+
+#### `is_empty()` ####
+Determines whether the HDFS object is empty or not.
+
+Parameters: None
+
+Returns:
+* boolean `True` when object is a directory and has no children or a file and is of 0 size, and `False` otherwise
+
+```python
+>>> o = hdfs.stat('/')
+>>> o.is_empty()
+False
+```
+
 
 #### `owner` ####
 Read-only property that retreives the HDFS object owner.
