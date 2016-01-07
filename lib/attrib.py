@@ -71,6 +71,9 @@ class WebHDFSObject(object):
     def is_dir(self):
         return self.kind == 'DIRECTORY'
 
+    def is_empty(self):
+        return self.is_dir() and self.bits['childrenNum'] == 0 or not self.is_dir() and self.size == 0
+
     @property
     def owner(self):
         return self.bits['owner']
