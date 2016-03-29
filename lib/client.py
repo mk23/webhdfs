@@ -67,7 +67,7 @@ class WebHDFSClient(object):
 
         try:
             for indx, base in enumerate(self.urls):
-                u = '%s/webhdfs/v1/%s' % (base, path.lstrip('/'))
+                u = '%s/webhdfs/v1/%s' % (base, requests.compat.quote(path.lstrip('/')))
                 try:
                     if not data:
                         r = getattr(requests, kind)(u, params=args, timeout=self.wait)
