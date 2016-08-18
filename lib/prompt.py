@@ -1,5 +1,6 @@
 import cmd
 import getpass
+import inspect
 import os
 import pwd
 import re
@@ -90,6 +91,9 @@ class WebHDFSPrompt(cmd.Cmd):
                 rval.append(part)
 
         return '/'+'/'.join(rval)
+
+    def _print_usage(self):
+        print getattr(self, inspect.stack()[1][3]).__doc__.strip().split('\n')[0]
 
     def _reset_prompt(self):
         self.prompt = '%s@%s r:%s l:%s> ' % (self.user, self.base.netloc, self.path, os.getcwd())
@@ -282,7 +286,7 @@ class WebHDFSPrompt(cmd.Cmd):
         except WebHDFSError as e:
             print e
         except ValueError as e:
-            print 'Usage: mv <source> <target>'
+            self._print_usage()
 
     def do_rm(self, path):
         '''
