@@ -73,7 +73,7 @@ class WebHDFSClient(object):
                         r = getattr(requests, kind)(u, params=args, timeout=self.wait)
                         self._log(r)
                         r.raise_for_status()
-                        return r.json()
+                        return r.json() if len(r.content) else ''
                     elif kind == 'put':
                         r = requests.put(u, params=args, allow_redirects=False, timeout=self.wait)
                         self._log(r)
@@ -193,6 +193,11 @@ class WebHDFSClient(object):
         p = self._fix(path)
         r = self._req('SETREPLICATION', p, 'put', replication=num)
         return r['boolean']
+
+    def chown(self, path, owner='', group=''):
+        p = self._fix(path)
+        r = self._req('SETOWNER', p, 'put', owner=owner, group=group)
+        return True
 
     def get(self, path, data=None):
         rval = True

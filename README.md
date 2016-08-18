@@ -19,6 +19,7 @@ Table of Contents
     * [`mv()`](#mvpath-dest)
     * [`rm()`](#rmpath)
     * [`repl()`](#replpath-num)
+    * [`chown()`](#chownpath-owner-group)
     * [`get()`](#getpath-datanone)
     * [`put()`](#putpath-data)
   * [WebHDFSObject](#webhdfsobject)
@@ -257,6 +258,32 @@ Returns:
 True
 >>> hdfs.stat('/user/%s/test' % getpass.getuser()).repl
 3
+```
+
+
+#### `chown(path, owner='', group='')` ####
+Sets the owner and/or group of a specified HDFS path.  Uses this WebHDFS REst request:
+
+    PUT <BASE>/webhdfs/v1/<PATH>?op=SETOWNER[&owner=<OWNER>][&group=<GROUP>]
+
+Parameters:
+* `path`:  HDFS path to change
+* `owner`: (_optional_) new object owner
+* `group`: (_optional_) new object group
+
+Returns:
+* Boolean `True` if ownership successfully applied
+
+Raises:
+* `WebHDFSIllegalArgumentError` if both owner and group are unspecified or empty
+
+```python
+>>> hdfs.chown('/user/%s/test' % getpass.getuser(), owner='other_owner', group='other_group')
+True
+>>> hdfs.stat('/user/%s/test' % getpass.getuser()).owner
+u'other_owner'
+>>> hdfs.stat('/user/%s/test' % getpass.getuser()).group
+u'other_group'
 ```
 
 
