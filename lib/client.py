@@ -199,6 +199,11 @@ class WebHDFSClient(object):
         r = self._req('SETOWNER', p, 'put', owner=owner, group=group)
         return True
 
+    def chmod(self, path, perm):
+        p = self._fix(path)
+        r = self._req('SETPERMISSION', p, 'put', permission='%o' % perm if isinstance(perm, int) else perm)
+        return True
+
     def get(self, path, data=None):
         rval = True
         if not data:

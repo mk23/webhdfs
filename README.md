@@ -20,6 +20,7 @@ Table of Contents
     * [`rm()`](#rmpath)
     * [`repl()`](#replpath-num)
     * [`chown()`](#chownpath-owner-group)
+    * [`chmod()`](#chmodpath-perm)
     * [`get()`](#getpath-datanone)
     * [`put()`](#putpath-data)
   * [WebHDFSObject](#webhdfsobject)
@@ -284,6 +285,31 @@ True
 u'other_owner'
 >>> hdfs.stat('/user/%s/test' % getpass.getuser()).group
 u'other_group'
+```
+
+
+#### `chmod(path, perm)` ####
+Sets the permission of a specified HDFS path.  Uses this WebHDFS REst request:
+
+    PUT <BASE>/webhdfs/v1/<PATH>?op=SETPERMISSION&permission=<PERM>
+
+Parameters:
+* `path`: HDFS path to change
+* `perm`: new object permission
+
+Returns:
+* Boolean `True` if permission successfully applied
+
+Raises:
+* `WebHDFSIllegalArgumentError` if permission is not octal integer under 0777
+
+```python
+>>> hdfs.stat('/user/%s/test' % getpass.getuser()).mode
+'-rwxr-xr-x'
+>>> hdfs.chmod('/user/%s/test' % getpass.getuser(), perm=0644)
+True
+>>> hdfs.stat('/user/%s/test' % getpass.getuser()).mode
+'-rw-r--r--'
 ```
 
 
