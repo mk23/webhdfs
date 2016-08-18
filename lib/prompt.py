@@ -142,9 +142,12 @@ class WebHDFSPrompt(cmd.Cmd):
 
         # Extract completion magic from method documentation
         docs = getattr(getattr(self, 'do_'+args[0], object), '__doc__')
-        rule = re.findall(r'(?:<(local|remote) (file/dir|file|dir)>)+', docs)[len(args) - 2]
+        rule = re.findall(r'(?:<(.+?)>)+', docs)[len(args) - 2]
 
-        return getattr(self, '_complete_'+rule[0])(args[-1], rule[1])
+        if re.search(r'(?:local|remote) (?:file/dir|file|dir)', rule):
+            kind, dest = rule.split()
+            return getattr(self, '_complete_'+kind)(args[-1], dest)
+
 
     def emptyline(self):
         pass
