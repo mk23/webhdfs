@@ -1,5 +1,6 @@
 import cmd
 import getpass
+import grp
 import inspect
 import os
 import pwd
@@ -132,6 +133,18 @@ class WebHDFSPrompt(cmd.Cmd):
 
         return [i.name + ('/' if i.is_dir() else ' ') for i in self.hdfs.ls(path, request=pick)]
 
+    def _complete_ownership(self, part, cache={}):
+        if ':' not in part:
+            if 'pwd' not in cache:
+                cache['pwd'] = pwd.getpwall()
+
+            return [i.pw_name for i in cache['pwd'] if i.pw_name.startswith(part)]
+        else:
+            if 'grp' not in cache:
+                cache['grp'] = grp.getgrall()
+
+            return [i.gr_name for i in cache['grp'] if i.gr_name.startswith(part.split(':', 1)[-1])]
+
     def completedefault(self, part, line, s, e):
         if part == '.' or part == '..':
             return [part + '/']
@@ -147,6 +160,8 @@ class WebHDFSPrompt(cmd.Cmd):
         if re.search(r'(?:local|remote) (?:file/dir|file|dir)', rule):
             kind, dest = rule.split()
             return getattr(self, '_complete_'+kind)(args[-1], dest)
+        if rule == '[owner][:group]':
+            return self._complete_ownership(args[-1])
 
 
     def emptyline(self):
@@ -321,6 +336,22 @@ class WebHDFSPrompt(cmd.Cmd):
             self.hdfs.rm(path)
         except WebHDFSError as e:
             print e
+
+    def do_chown(self, args):
+        '''
+            Usage: chown <[owner][:group]> <remote file/dir>
+
+            Change ownership of remote file to owner and/or group
+        '''
+        try:
+            dest, path = shlex.split(args)
+            path = self._fix_path(path, required='chown')
+            o, g = dest.split(':', 1) if ':' in dest else (dest, '')
+            self.hdfs.chown(path, owner=o, group=g)
+        except WebHDFSError as e:
+            print e
+        except ValueError:
+            self._print_usage()
 
     def do_get(self, path):
         '''
