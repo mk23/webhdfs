@@ -174,15 +174,27 @@ Gets the usage of a specified HDFS path.  Uses this WebHDFS REst request:
 
 Parameters:
 * `path`: HDFS path to analyze
-* `real`: (_optional_) return machine usage instead of HDFS usage, taking replication factor into account
+* `real`: (_optional_) specifies return type
 
 Returns:
-* Integer of bytes used by the specified path.
+* If `real` is `None`:          Instance of a `du` object: `du(dirs=, files=, hdfs_usage=, disk_usage=, hdfs_quota=, disk_quota=)`
+* If `real` is a string:        Integer for the `du` object attribute name.
+* If `real` is boolean `True`:  Integer of hdfs bytes used by the specified path.
+* If `real` is boolean `False`: Integer of disk bytes used by the specified path.
 
 ```python
 >>> u = hdfs.du('/user')
 >>> print u
 110433
+>>> u = hdfs.du('/user', real=True)
+>>> print u
+331299
+>>> u = hdfs.du('/user', real='disk_quota')
+>>> print u
+-1
+>>> u = hdfs.du('/user', real=None)
+>>> print u
+du(dirs=3, files=5, hdfs_usage=110433, disk_usage=331299, hdfs_quota=-1, disk_quota=-1)
 ```
 
 

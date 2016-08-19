@@ -1,3 +1,4 @@
+import collections
 import errno
 import fnmatch
 import logging
@@ -170,8 +171,20 @@ class WebHDFSClient(object):
 
     def du(self, path, real=False):
         p = self._fix(path)
-        r = self._req('GETCONTENTSUMMARY', p)
-        return r['ContentSummary']['length'] if not real else r['ContentSummary']['spaceConsumed']
+        r = self._req('GETCONTENTSUMMARY', p)['ContentSummary']
+
+        n = collections.namedtuple('du', ['dirs', 'files', 'hdfs_usage', 'disk_usage', 'hdfs_quota', 'disk_quota'])
+        d = n(r['directoryCount'], r['fileCount'], r['length'], r['spaceConsumed'], r['quota'], r['spaceQuota'])
+        if isinstance(real, str):
+            try:
+                return getattr(d, real)
+            except AttributeError:
+                raise WebHDFSIllegalArgumentError('\'%s\' is an invalid summary attribute' % real)
+        elif isinstance(real, bool):
+            return d.hdfs_usage if not real else d.disk_usage
+        else:
+            return d
+
 
     def mkdir(self, path):
         p = self._fix(path)
