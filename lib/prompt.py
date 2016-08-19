@@ -147,6 +147,13 @@ class WebHDFSPrompt(cmd.Cmd):
             rval = [i.gr_name for i in cache['grp'] if i.gr_name.startswith(part.split(':', 1)[-1])]
             return rval if len(rval) != 1 else [rval[0] + ' ']
 
+    def _complete_permission(self, part):
+        mode = int(part, 8) if part else 0
+        if len(part) < 4 and (mode << 3) < 0777:
+            return [oct((mode << 3) + i) for i in range(1, 8)]
+        else:
+            return [oct(mode) + ' ']
+
     def completedefault(self, part, line, s, e):
         if part == '.' or part == '..':
             return [part + '/']
@@ -164,6 +171,8 @@ class WebHDFSPrompt(cmd.Cmd):
             return getattr(self, '_complete_'+kind)(args[-1], dest)
         if rule == '[owner][:group]':
             return self._complete_ownership(args[-1])
+        if rule == 'mode':
+            return self._complete_permission(args[-1])
 
 
     def emptyline(self):
@@ -350,6 +359,21 @@ class WebHDFSPrompt(cmd.Cmd):
             path = self._fix_path(path, required='chown')
             o, g = dest.split(':', 1) if ':' in dest else (dest, '')
             self.hdfs.chown(path, owner=o, group=g)
+        except WebHDFSError as e:
+            print e
+        except ValueError:
+            self._print_usage()
+
+    def do_chmod(self, args):
+        '''
+            Usage: chmod <mode> <remote file/dir>
+
+            Change permission on remote file or directory
+        '''
+        try:
+            perm, path = shlex.split(args)
+            path = self._fix_path(path, required='chmod')
+            self.hdfs.chmod(path, perm)
         except WebHDFSError as e:
             print e
         except ValueError:
