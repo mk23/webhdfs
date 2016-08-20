@@ -133,6 +133,13 @@ class WebHDFSPrompt(cmd.Cmd):
 
         return [i.name + ('/' if i.is_dir() and not i.is_empty() else ' ') for i in self.hdfs.ls(path, request=pick)]
 
+    def _complete_du(self, part, cache=[]):
+        if not cache:
+            cache.extend(['dirs', 'files', 'hdfs_usage', 'disk_usage', 'hdfs_quota', 'disk_usage'])
+
+        rval = [i for i in cache if i.startswith(part)]
+        return rval if len(rval) != 1 else [rval[0] + ' ']
+
     def _complete_chown(self, part, cache={}):
         if ':' not in part:
             if 'pwd' not in cache:
@@ -268,15 +275,21 @@ class WebHDFSPrompt(cmd.Cmd):
         except OSError as e:
             print e
 
-    def do_du(self, path=None):
+    def do_du(self, args=''):
         '''
-            Usage: du <remote file/dir>
+            Usage: du <remote file/dir> [du options]
 
-            Displays disk usage for remote file or directory
+            Options: dirs|files|hdfs_size|disk_size|hdfs_quota|disk_quota
+
+            Displays usage for remote file or directory
         '''
         try:
-            path = self._fix_path(path)
-            print self.hdfs.du(path)
+            args = shlex.split(args)
+            if len(args) > 2:
+                return self._print_usage()
+
+            path = self._fix_path(args[0] if len(args) > 0 else None)
+            print self.hdfs.du(path, args[1] if len(args) == 2 else 'hdfs_usage')
         except WebHDFSError as e:
             print e
 
