@@ -133,7 +133,7 @@ class WebHDFSPrompt(cmd.Cmd):
 
         return [i.name + ('/' if i.is_dir() and not i.is_empty() else ' ') for i in self.hdfs.ls(path, request=pick)]
 
-    def _complete_ownership(self, part, cache={}):
+    def _complete_chown(self, part, cache={}):
         if ':' not in part:
             if 'pwd' not in cache:
                 cache['pwd'] = pwd.getpwall()
@@ -147,7 +147,7 @@ class WebHDFSPrompt(cmd.Cmd):
             rval = [i.gr_name for i in cache['grp'] if i.gr_name.startswith(part.split(':', 1)[-1])]
             return rval if len(rval) != 1 else [rval[0] + ' ']
 
-    def _complete_permission(self, part):
+    def _complete_chmod(self, part):
         mode = int(part, 8) if part else 0
         if len(part) < 4 and (mode << 3) < 0777:
             return [oct((mode << 3) + i) for i in range(1, 8)]
@@ -164,16 +164,13 @@ class WebHDFSPrompt(cmd.Cmd):
 
         # Extract completion magic from method documentation
         docs = getattr(getattr(self, 'do_'+args[0], object), '__doc__')
-        rule = re.findall(r'(?:<(.+?)>)+', docs)[len(args) - 2]
+        rule = re.findall(r'(?:[<\[](.+?)[>\]])+', docs)[len(args) - 2]
 
         if re.search(r'(?:local|remote) (?:file/dir|file|dir)', rule):
             kind, dest = rule.split()
             return getattr(self, '_complete_'+kind)(args[-1], dest)
-        if rule == '[owner][:group]':
-            return self._complete_ownership(args[-1])
-        if rule == 'mode':
-            return self._complete_permission(args[-1])
-
+        if re.search(r'\w+ options', rule):
+            return getattr(self, '_complete_'+rule.split()[0])(args[-1])
 
     def emptyline(self):
         pass
@@ -350,7 +347,9 @@ class WebHDFSPrompt(cmd.Cmd):
 
     def do_chown(self, args):
         '''
-            Usage: chown <[owner][:group]> <remote file/dir>
+            Usage: chown <chown options> <remote file/dir>
+
+            Options: [owner][:group]
 
             Change ownership of remote file or directory
         '''
@@ -366,7 +365,9 @@ class WebHDFSPrompt(cmd.Cmd):
 
     def do_chmod(self, args):
         '''
-            Usage: chmod <mode> <remote file/dir>
+            Usage: chmod <chmod options> <remote file/dir>
+
+            Options: octal mode: 0000 - 0777
 
             Change permission on remote file or directory
         '''
