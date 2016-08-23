@@ -1,3 +1,10 @@
+webhdfs (1.0.9) stable; urgency=medium
+
+  * Tagging 1.0.9
+  * [7fb6e0c] Issue #37: Update debian source format. (Max Kalika)
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Tue, 23 Aug 2016 08:14:20 -0700
+
 webhdfs (1.0.8) stable; urgency=medium
 
   * Tagging 1.0.8
