@@ -1,3 +1,32 @@
+webhdfs (1.0.8) stable; urgency=medium
+
+  * Tagging 1.0.8
+  * [f09432c] Issue #32: Add optional du shell command parameter for
+    more summary information fetching. (Max Kalika)
+  * [097980f] Issue #34: Further extend completer rule detection to be
+    more generic at picking provider and support optional args. (Max
+    Kalika)
+  * [2427826] Issue #32: Enchance du API call with access to more data.
+    (Max Kalika)
+  * [e260722] Issue #30: Add shell chmod command and completion. (Max
+    Kalika)
+  * [e324fbb] Issue #36: Skip to the next parameter when there's only
+    one completion candidate. (Max Kalika)
+  * [cf05f87] Issue #29: Implement chown shell command with autocomplete
+    for local users/groups. (Max Kalika)
+  * [b4e05a2] Issue #34: Refactor completer rule detection for cases
+    other than path. (Max Kalika)
+  * [b2162be] Issue #35: Create dynamic usage function for shell
+    commands. (Max Kalika)
+  * [d3ee30d] Issue #30: Add chmod() API call and documentation. (Max
+    Kalika)
+  * [c9ffe17] Issue #29: Add chown() API call and documentation. (Max
+    Kalika)
+  * [73ee604] Issue #31: URL encoode paths when calling webhdfs rest
+    API. (Max Kalika)
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Mon, 22 Aug 2016 18:52:20 -0700
+
 webhdfs (1.0.7) stable; urgency=medium
 
   * Tagging 1.0.7
