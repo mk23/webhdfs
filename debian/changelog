@@ -1,3 +1,11 @@
+webhdfs (1.0.10) stable; urgency=medium
+
+  * Tagging 1.0.10
+  * [0f916d4] Issue #38: Pass request filter to subdirectories of the
+    recursive ls call. (Max Kalika)
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Mon, 05 Dec 2016 15:46:18 -0800
+
 webhdfs (1.0.9) stable; urgency=medium
 
   * Tagging 1.0.9
