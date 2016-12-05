@@ -145,7 +145,7 @@ class WebHDFSClient(object):
             if not callable(request) or request(o):
                 yield o
                 if recurse and o.is_dir():
-                    for o in self.ls('%s/%s' % (p, o.name), recurse):
+                    for o in self.ls('%s/%s' % (p, o.name), recurse, request):
                         yield o
 
     def glob(self, path):
