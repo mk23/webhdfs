@@ -23,6 +23,7 @@ Table of Contents
     * [`chmod()`](#chmodpath-perm)
     * [`get()`](#getpath-datanone)
     * [`put()`](#putpath-data)
+    * [`calls`](#calls)
   * [WebHDFSObject](#webhdfsobject)
     * [`__init__()`](#__init__path-bits)
     * [`is_dir()`](#is_dir)
@@ -356,6 +357,15 @@ Returns:
 
 Raises:
 * `WebHDFSIncompleteTransferError`
+
+#### `calls` ####
+Read-only property that retrieves number of HTTP requests performed so far.
+
+```python
+>>> l = list(hdfs.ls('/user', recurse=True))
+>>> hdfs.calls
+11
+```
 
 
 ## `WebHDFSObject` ##
