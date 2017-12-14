@@ -17,6 +17,7 @@ class WebHDFSClient(object):
     def __init__(self, base, user, conf=None, wait=None):
         self.user = user
         self.wait = wait or 0.5
+        self.http = requests.Session()
         self._cnt = 0
         self._cfg(base, conf)
 
@@ -72,23 +73,23 @@ class WebHDFSClient(object):
                 u = '%s/webhdfs/v1/%s' % (base, requests.compat.quote(path.lstrip('/')))
                 try:
                     if not data:
-                        r = getattr(requests, kind)(u, params=args, timeout=self.wait)
+                        r = getattr(self.http, kind)(u, params=args, timeout=self.wait)
                         self._log(r)
                         self._cnt += 1
                         r.raise_for_status()
                         return r.json() if len(r.content) else ''
                     elif kind == 'put':
-                        r = requests.put(u, params=args, allow_redirects=False, timeout=self.wait)
+                        r = self.http.put(u, params=args, allow_redirects=False, timeout=self.wait)
                         self._log(r)
                         self._cnt += 1
                         r.raise_for_status()
-                        r = requests.put(r.headers['location'], headers={'content-type': 'application/octet-stream'}, data=data)
+                        r = self.http.put(r.headers['location'], headers={'content-type': 'application/octet-stream'}, data=data)
                         self._log(r)
                         self._cnt += 1
                         r.raise_for_status()
                         return True
                     else:
-                        r = requests.get(u, params=args, stream=True, timeout=self.wait)
+                        r = self.http.get(u, params=args, stream=True, timeout=self.wait)
                         self._log(r)
                         self._cnt += 1
                         r.raise_for_status()
