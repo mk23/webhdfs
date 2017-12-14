@@ -26,9 +26,9 @@ class WebHDFSPrompt(cmd.Cmd):
 
         self.base = urlparse.urlparse(base)
         self.user = getpass.getuser()
-        self.hdfs = WebHDFSClient(base, self.user, conf, wait)
+        self.hdfs = WebHDFSClient(self.base._replace(path='').geturl(), self.user, conf, wait)
 
-        self.do_cd(path)
+        self.do_cd(path or self.base.path)
 
         if task:
             self.onecmd(' '.join(task))
