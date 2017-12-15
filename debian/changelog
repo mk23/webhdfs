@@ -1,3 +1,18 @@
+webhdfs (1.0.12+upstream1) xenial; urgency=medium
+
+  * Tagging 1.0.12+upstream1
+  * [5cafee0] Issue #48: Change maintainer version separator to '+' for
+    PEP 440. (Max Kalika)
+  * [cb702e2] Issue #47: Update help2man call to new module location.
+    (Max Kalika)
+  * [6454876] Issue #47: Update python packaging to new module source
+    location. (Max Kalika)
+  * [654d652] Issue #47: Move modules files to lib/webhdfs. (Max Kalika)
+  * [9261b30] Issue #46: Add help2man to debian build dependencies. (Max
+    Kalika)
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Fri, 15 Dec 2017 11:43:30 -0800
+
 webhdfs (1.0.11-upstream1) xenial; urgency=medium
 
   * Tagging 1.0.11-upstream1
