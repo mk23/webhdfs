@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 
 from setuptools import setup
-from lib import __version__
+from lib.webhdfs import __version__
 
 if __name__ == '__main__':
     setup(
@@ -13,7 +13,7 @@ if __name__ == '__main__':
         version=__version__,
         scripts=['webhdfs'],
         packages=['webhdfs'],
-        package_dir={'webhdfs': 'lib'},
+        package_dir={'webhdfs': 'lib/webhdfs'},
         license='LICENSE.txt',
         install_requires=['requests', 'setuptools']
     )
