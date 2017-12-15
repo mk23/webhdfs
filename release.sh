@@ -19,7 +19,7 @@ echo
 	exec /usr/bin/env python2.7 - ${COMMIT} \
 		--release=xenial \
 		--append=-upstream1 \
-		--extra lib/__init__.py "__version__ = '{version}'" \
+		--extra lib/webhdfs/__init__.py "__version__ = '{version}'" \
 		"$@"
 
 if [ -n "${COMMIT}" ] ; then
