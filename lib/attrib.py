@@ -76,17 +76,17 @@ class WebHDFSObject(object):
 
     @property
     def owner(self):
-        return self.bits['owner']
+        return self.bits['owner'].encode('utf8')
     @property
     def group(self):
-        return self.bits['group']
+        return self.bits['group'].encode('utf8')
 
     @property
     def name(self):
-        return self.bits['pathSuffix']
+        return self.bits['pathSuffix'].encode('utf8') if isinstance(self.bits['pathSuffix'], unicode) else self.bits['pathSuffix']
     @property
     def full(self):
-        return '%s/%s' % (self.path, self.bits['pathSuffix'])
+        return '%s/%s' % (self.path, self.name)
 
     @property
     def size(self):
@@ -98,7 +98,7 @@ class WebHDFSObject(object):
 
     @property
     def kind(self):
-        return self.bits['type']
+        return self.bits['type'].encode('utf8')
 
     @property
     def date(self):

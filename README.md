@@ -295,9 +295,9 @@ Raises:
 >>> hdfs.chown('/user/%s/test' % getpass.getuser(), owner='other_owner', group='other_group')
 True
 >>> hdfs.stat('/user/%s/test' % getpass.getuser()).owner
-u'other_owner'
+'other_owner'
 >>> hdfs.stat('/user/%s/test' % getpass.getuser()).group
-u'other_group'
+'other_group'
 ```
 
 
@@ -418,7 +418,7 @@ Read-only property that retreives the HDFS object owner.
 ```python
 >>> o = hdfs.stat('/')
 >>> o.owner
-u'hdfs'
+'hdfs'
 ```
 
 #### `group` ####
@@ -427,7 +427,7 @@ Read-only property that retreives the HDFS object group.
 ```python
 >>> o = hdfs.stat('/')
 >>> o.group
-u'supergroup'
+'supergroup'
 ```
 
 #### `name` ####
@@ -472,7 +472,7 @@ Read-only property that retreives the HDFS object type (`FILE` or `DIRECTORY`).
 ```python
 >>> o = hdfs.stat('/user/max/snmpy.mib')
 >>> o.kind
-u'FILE'
+'FILE'
 ```
 
 #### `date` ####
