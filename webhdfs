@@ -58,11 +58,11 @@ if __name__ == '__main__':
                         help='run this command and exit')
     parser.epilog = textwrap.dedent('''
         supported logger formats:
-          console://?level=LEVEL
-          file://PATH?level=LEVEL
-          syslog+tcp://HOST:PORT/?facility=FACILITY&level=LEVEL
-          syslog+udp://HOST:PORT/?facility=FACILITY&level=LEVEL
-          syslog+unix://PATH?facility=FACILITY&level=LEVEL
+          -  console://?level=LEVEL
+          -  file://PATH?level=LEVEL
+          -  syslog+tcp://HOST:PORT/?facility=FACILITY&level=LEVEL
+          -  syslog+udp://HOST:PORT/?facility=FACILITY&level=LEVEL
+          -  syslog+unix://PATH?facility=FACILITY&level=LEVEL
     ''')
     args = parser.parse_args()
     create_log(args.log)

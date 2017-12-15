@@ -1,0 +1,18 @@
+Include file for help2man man page
+
+--locale=C --no-discard-stderr --no-info --section 1 --name 'webhdfs cli shell'
+
+[SYNOPSIS]
+webhdfs [options]
+
+/WebHDFS CLI Shell/
+Allows navigation of an HDFS cluster using a convinient UNIX-like shell with
+intelligent tab-competions.
+
+[SEE ALSO]
+.BR https://hadoop.apache.org/docs/r1.0.4/webhdfs.html
+
+[RESOURCES]
+Details on API implementation and latest versions are available at:
+
+	https://github.com/mk23/snmpy

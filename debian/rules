@@ -10,3 +10,11 @@ export DH_VERBOSE=1
 
 %:
 	dh $@ --with python2
+
+override_dh_clean:
+	dh_clean
+	rm -rf webhdfs.egg-info webhdfs.1
+
+override_dh_auto_configure:
+	dh_auto_configure
+	H2M_ENABLED=1 PYTHONPATH=$(shell find build -type d -name webhdfs -exec dirname {} \\;) help2man -i debian/h2m -o webhdfs.1 ./webhdfs
