@@ -50,7 +50,7 @@ if __name__ == '__main__':
                         help='hdfs configuration dir')
     parser.add_argument('-t', '--timeout', type=float,
                         help='request timeout in seconds')
-    parser.add_argument('-v', '--version', default=False, action='store_true',
+    parser.add_argument('-v', '--version', action='version', version=__version__,
                         help='print version and exit')
     parser.add_argument('url',
                         help='webhdfs base url')
@@ -65,13 +65,9 @@ if __name__ == '__main__':
           syslog+unix://PATH?facility=FACILITY&level=LEVEL
     ''')
     args = parser.parse_args()
+    create_log(args.log)
 
-    if args.version:
-        print __version__
-    else:
-        create_log(args.log)
-
-        try:
-            WebHDFSPrompt(args.url, args.cfg, args.cwd, args.cmd, args.timeout).cmdloop()
-        except KeyboardInterrupt:
-            print
+    try:
+        WebHDFSPrompt(args.url, args.cfg, args.cwd, args.cmd, args.timeout).cmdloop()
+    except KeyboardInterrupt:
+        print
