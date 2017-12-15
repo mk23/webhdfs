@@ -1,3 +1,37 @@
+webhdfs (1.0.11-upstream1) xenial; urgency=medium
+
+  * Tagging 1.0.11-upstream1
+  * [947d5d9] Issue #45: Add dh-python build dependency for Xenial. (Max
+    Kalika)
+  * [bc8ec03] Issue #43: (lintian) Update standards version to 3.9.7.
+    (Max Kalika)
+  * [9fbffeb] Issue #43: (lintian) Set distribution to Xenial and add
+    maintainer version suffix. (Max Kalika)
+  * [19ad2d6] Issue #43: (lintian) Remove LICENSE.txt from docs. (Max
+    Kalika)
+  * [21979f8] Issue #43: (lintian) Longer extended description. (Max
+    Kalika)
+  * [2276d5e] Issue #43: (lintian) change debian section to python. (Max
+    Kalika)
+  * [d51b5b4] Issue #43: (lintian) Add debian copyright. (Max Kalika)
+  * [ec0ade8] Issue #43: (lintian) Add manpage for the shell. (Max
+    Kalika)
+  * [da2b815] Issue #44: use argparse's internal version action. (Max
+    Kalika)
+  * [24c1f26] Issue #40: Convert all unicode to str to avoid random
+    failures. (Max Kalika)
+  * [41543fb] Issue #41: Treat the path part of the url as initial
+    directory unless overriden by -d in the shell invocation. (Max
+    Kalika)
+  * [cf30954] Issue #39: Reuse http connections for individual
+    WebHDFSClient instances. (Max Kalika)
+  * [4eb7145] Issue #42: Add http call counter documentation. (Max
+    Kalika)
+  * [936ecd0] Issue #42: Add http call counter and getter property. (Max
+    Kalika)
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Fri, 15 Dec 2017 10:20:40 -0800
+
 webhdfs (1.0.10) stable; urgency=medium
 
   * Tagging 1.0.10
