@@ -16,7 +16,11 @@ echo
 	/usr/bin/curl -L -s https://raw.github.com/mk23/sandbox/master/misc/release.py ||
 	echo 'raise Exception("unable to load release.py")'
 ) |
-	exec /usr/bin/env python2.7 - ${COMMIT} --release stable -e lib/__init__.py "__version__ = '{version}'" "$@"
+	exec /usr/bin/env python2.7 - ${COMMIT} \
+		--release=xenial \
+		--append=-upstream1 \
+		--extra lib/__init__.py "__version__ = '{version}'" \
+		"$@"
 
 if [ -n "${COMMIT}" ] ; then
 	echo
