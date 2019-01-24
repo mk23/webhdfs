@@ -42,7 +42,7 @@ def perm_to_mode(perm):
 
 class WebHDFSObject(object):
     def __init__(self, path, bits):
-        self.path = path.rstrip('/')
+        self.path = (path.encode('utf8') if isinstance(path, unicode) else path).rstrip('/')
         self.bits = bits
 
         if not self.bits['pathSuffix']:
