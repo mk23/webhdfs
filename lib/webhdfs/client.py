@@ -8,7 +8,7 @@ import tempfile
 import urlparse
 import xml.etree.cElementTree as ET
 
-from errors import WebHDFSError, WebHDFSConnectionError, WebHDFSFileNotFoundError, WebHDFSIncompleteTransferError
+from errors import WebHDFSError, WebHDFSConnectionError, WebHDFSFileNotFoundError, WebHDFSIllegalArgumentError, WebHDFSIncompleteTransferError
 from attrib import WebHDFSObject
 
 LOG = logging.getLogger()
