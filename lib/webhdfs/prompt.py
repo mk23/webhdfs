@@ -279,7 +279,7 @@ class WebHDFSPrompt(cmd.Cmd):
         '''
             Usage: du <remote file/dir> [du options]
 
-            Options: dirs|files|hdfs_size|disk_size|hdfs_quota|disk_quota
+            Options: dirs|files|hdfs_usage|disk_usage|hdfs_quota|disk_quota
 
             Displays usage for remote file or directory
         '''
