@@ -3,11 +3,11 @@ Upstream-Name: webhdfs
 Source: https://github.com/mk23/webhdfs
 
 Files: *
-Copyright: 2011-2017 Max Kalika <max.kalika+projects@gmail.com>
+Copyright: 2011-2019 Max Kalika <max.kalika+projects@gmail.com>
 License: MIT
 
 Files: debian/*
-Copyright: 2011-2017 Max Kalika <max.kalika+projects@gmail.com>
+Copyright: 2011-2019 Max Kalika <max.kalika+projects@gmail.com>
 License: MIT
 
 License: MIT
