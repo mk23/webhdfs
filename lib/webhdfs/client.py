@@ -1,4 +1,5 @@
 import collections
+import datetime
 import errno
 import fnmatch
 import logging
@@ -225,6 +226,20 @@ class WebHDFSClient(object):
     def chmod(self, path, perm):
         p = self._fix(path)
         r = self._req('SETPERMISSION', p, 'put', permission='%o' % perm if isinstance(perm, int) else perm)
+        return True
+
+    def touch(self, path, time=None):
+        p = self._fix(path)
+        d = datetime.datetime.now()
+        if isinstance(time, datetime.datetime):
+            d = time
+        elif isinstance(time, int):
+            d = datetime.datetime.fromtimestamp(time)
+        elif time is not None:
+            raise WebHDFSIllegalArgumentError('\'%s\' is an invalid time argument' % time)
+        if not self.stat(p, True):
+            self.put(p, '')
+        r = self._req('SETTIMES', p, 'put', modificationtime=d.strftime('%s000'))
         return True
 
     def get(self, path, data=None):
