@@ -21,6 +21,7 @@ Table of Contents
     * [`repl()`](#replpath-num)
     * [`chown()`](#chownpath-owner-group)
     * [`chmod()`](#chmodpath-perm)
+    * [`touch()`](#touchpath-timenone)
     * [`get()`](#getpath-datanone)
     * [`put()`](#putpath-data)
     * [`calls`](#calls)
@@ -323,6 +324,33 @@ Raises:
 True
 >>> hdfs.stat('/user/%s/test' % getpass.getuser()).mode
 '-rw-r--r--'
+```
+
+
+#### `touch(path, time=None)` ####
+Sets the modification time of a specified HDFS path, optionally creating it.  Uses this WebHDFS REst request:
+
+    PUT <BASE>/webhdfs/v1/<PATH>?op=SETTIMES&modificationtime=<TIME>
+
+Parameters:
+* `path`: HDFS path to change
+* `time`: (_optional_) object modification time, represented as a Python [datetime](https://docs.python.org/2/library/datetime.html) object or `int` epoch timestamp, defaulting to current time
+
+Returns:
+* Boolean `True` if modification time successfully changed
+
+Raises:
+* `WebHDFSIllegalArgumentError` if time is not a valid type
+
+```python
+>>> hdfs.touch('/user/%s/new_test' % getpass.getuser())
+True
+>>> hdfs.stat('/user/%s/new_test' % getpass.getuser()).date
+datetime.datetime(2019, 1, 28, 12, 10, 20)
+>>> hdfs.touch('/user/%s/new_test' % getpass.getuser(), datetime.datetime(2018, 9, 27, 11, 1, 17))
+True
+>>> hdfs.stat('/user/%s/new_test' % getpass.getuser()).date
+datetime.datetime(2018, 9, 27, 11, 1, 17)
 ```
 
 
