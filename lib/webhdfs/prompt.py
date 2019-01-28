@@ -393,6 +393,29 @@ class WebHDFSPrompt(cmd.Cmd):
         except ValueError:
             self._print_usage()
 
+    def do_touch(self, args):
+        '''
+            Usage touch <remote file> [epoch time]
+
+            Change modification time on remote file, optionally creating it
+        '''
+        try:
+            args = shlex.split(args)
+            if len(args) > 2:
+                return self._print_usage()
+
+            path = self._fix_path(args[0])
+            time = None
+            try:
+                time = int(args[1])
+            except Exception as e:
+                if not isinstance(e, (ValueError, IndexError)):
+                    self._print_usage()
+
+            self.hdfs.touch(path, time)
+        except WebHDFSError as e:
+            print e
+
     def do_get(self, path):
         '''
             Usage: get <remote file>
