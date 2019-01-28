@@ -1,3 +1,23 @@
+webhdfs (1.0.14) xenial; urgency=medium
+
+  * Tagging 1.0.14
+  * [45c4884] Issue #51: document new environment variables for
+    preserving shell history. (Max Kalika)
+  * [4994689] Issue #51: preserve shell history between sessions. (Max
+    Kalika)
+  * [45150f0] Issue #55: catch unicode errors in exception handlers.
+    (Max Kalika)
+  * [98c2c23] Issue #56: document touch() API call. (Max Kalika)
+  * [f7447c1] Issue #56: Add touch shell command. (Max Kalika)
+  * [c4e95f0] Issue #56: Add touch() API call. (Max Kalika)
+  * [abc348b] Issue #50. Update copyright year. (Max Kalika)
+  * [a13669b] Issue #53: Fix shell du command help options. (Max Kalika)
+  * [9025e40] Issue #52: Add missing import for
+    WebHDFSIllegalArgumentError. (Max Kalika)
+  * [3b3600d] Issue #55: properly encode unicode paths. (Max Kalika)
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Mon, 28 Jan 2019 12:52:50 -0800
+
 webhdfs (1.0.13) xenial; urgency=medium
 
   * Tagging 1.0.13
