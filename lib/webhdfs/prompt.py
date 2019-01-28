@@ -1,3 +1,4 @@
+import atexit
 import cmd
 import getpass
 import grp
@@ -33,6 +34,22 @@ class WebHDFSPrompt(cmd.Cmd):
         if task:
             self.onecmd(' '.join(task))
             sys.exit(0)
+
+        try:
+            self.hist = os.path.join(os.path.expanduser('~'), os.environ.get('WEBHDFS_HISTFILE', '.webhdfs_history'))
+            readline.read_history_file(self.hist)
+
+        except IOError:
+            pass
+
+        try:
+            readline.set_history_length(int(os.environ.get('WEBHDFS_HISTSIZE', 3)))
+        except ValueError:
+            readline.set_history_length(0)
+
+        if os.access(self.hist, os.W_OK):
+            atexit.register(readline.write_history_file, self.hist)
+
 
     def _list_dir(self, sources):
         subdirs = []
