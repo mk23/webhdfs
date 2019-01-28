@@ -7,7 +7,7 @@ class WebHDFSError(Exception):
             e = message.get('RemoteException', {}).get('exception', 'UnknownException')
             c = getattr(sys.modules[__name__], 'WebHDFS'+e.replace('Exception', 'Error'), WebHDFSUnknownRemoteError)
 
-            raise c(m)
+            raise c(m.encode('utf8') if isinstance(m, unicode) else m)
 
         Exception.__init__(self, message)
 
