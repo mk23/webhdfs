@@ -574,6 +574,8 @@ Parameters:
 
 Environment Variables:
 * `HADOOP_CONF_DIR`: alternative to and takes precedence over the `-c | --cfg` command-line parameter
+* `WEBHDFS_HISTFILE`: (_optional_) specify the preserved history file, defaulting to `~/.webhdfs_history`
+* `WEBHDFS_HISTSIZE`: (_optional_) specify the preserved history size, defaulting to 1000; set to 0 to disable
 
 License
 -------
