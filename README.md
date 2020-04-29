@@ -579,4 +579,4 @@ Environment Variables:
 
 License
 -------
-[MIT](http://mk23.mit-license.org/2015-2019/license.html)
+[MIT](http://mk23.mit-license.org/2015-2020/license.html)
