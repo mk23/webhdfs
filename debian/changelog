@@ -1,3 +1,14 @@
+webhdfs (2.0.0) xenial; urgency=medium
+
+  * Tagging 2.0.0
+  * [1b97d4c] Issue #59: Convert to Python 3, deprecate Python 2. (Max
+    Kalika)
+  * [8d5782d] Issue #58: Update copyright year. (Max Kalika)
+  * [f1177b3] Issue #57: fix copy/paste (snmpy -> webhdfs) in manpage
+    template. (Max Kalika)
+
+ -- Max Kalika <max.kalika+projects@gmail.com>  Wed, 29 Apr 2020 19:02:08 +0000
+
 webhdfs (1.0.14) xenial; urgency=medium
 
   * Tagging 1.0.14
