@@ -2,15 +2,20 @@ import collections
 import datetime
 import errno
 import fnmatch
+import functools
 import logging
 import os
 import requests
 import tempfile
-import urlparse
+import urllib.parse
 import xml.etree.cElementTree as ET
 
-from errors import WebHDFSError, WebHDFSConnectionError, WebHDFSFileNotFoundError, WebHDFSIllegalArgumentError, WebHDFSIncompleteTransferError
-from attrib import WebHDFSObject
+from .attrib import WebHDFSObject
+from .errors import WebHDFSError
+from .errors import WebHDFSConnectionError
+from .errors import WebHDFSFileNotFoundError
+from .errors import WebHDFSIllegalArgumentError
+from .errors import WebHDFSIncompleteTransferError
 
 LOG = logging.getLogger()
 
@@ -30,7 +35,7 @@ class WebHDFSClient(object):
         return url.geturl()
 
     def _cfg(self, base, conf=None):
-        url = urlparse.urlparse(base)
+        url = urllib.parse.urlparse(base)
         self.urls = []
 
         for part in ('hdfs', 'core'):
@@ -117,8 +122,8 @@ class WebHDFSClient(object):
         LOG.debug('url:  %s', rsp.url)
         LOG.debug('code: %d %s', rsp.status_code, rsp.reason)
 
-        w = reduce(lambda x, y: max(x, len(y)), rsp.headers.keys(), 0)
-        for k, v in sorted(rsp.headers.iteritems()):
+        w = functools.reduce(lambda x, y: max(x, len(y)), rsp.headers.keys(), 0)
+        for k, v in sorted(rsp.headers.items()):
             LOG.debug('  %%-%ds : %%s' % w, k, v)
 
     def _fix(self, path):
@@ -264,7 +269,11 @@ class WebHDFSClient(object):
 
     def put(self, path, data):
         if isinstance(data, str):
+            data = bytes(data, 'utf8')
+
+        if isinstance(data, bytes):
             temp = tempfile.TemporaryFile()
+
             temp.write(data)
             temp.flush()
             temp.seek(0)

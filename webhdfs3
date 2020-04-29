@@ -1,10 +1,10 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 import argparse
 import logging
 import socket
 import textwrap
-import urlparse
+import urllib.parse
 
 from webhdfs import __version__
 from webhdfs.prompt import WebHDFSPrompt
@@ -17,8 +17,8 @@ def create_log(logger=None):
     fmt = '%(asctime)s.%(msecs)03d%(module)20s:%(lineno)-3d %(threadName)-12s %(levelname)8s: %(message)s'
 
     if logger:
-        url = urlparse.urlparse(logger)
-        arg = urlparse.parse_qs(url.query)
+        url = urllib.parse.urlparse(logger)
+        arg = urllib.parse.parse_qs(url.query)
 
         if url.scheme in ('file', '') and url.path:
             log = logging.handlers.WatchedFileHandler(url.path)
@@ -50,7 +50,8 @@ if __name__ == '__main__':
                         help='hdfs configuration dir')
     parser.add_argument('-t', '--timeout', type=float,
                         help='request timeout in seconds')
-    parser.add_argument('-v', '--version', action='version', version=__version__,
+    parser.add_argument('-v', '--version', action='version',
+                        version='%%(prog)s %s' % __version__,
                         help='print version and exit')
     parser.add_argument('url',
                         help='webhdfs base url')
@@ -70,4 +71,4 @@ if __name__ == '__main__':
     try:
         WebHDFSPrompt(args.url, args.cfg, args.cwd, args.cmd, args.timeout).cmdloop()
     except KeyboardInterrupt:
-        print
+        print()

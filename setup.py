@@ -1,5 +1,3 @@
-#!/usr/bin/env python2.7
-
 from setuptools import setup
 from lib.webhdfs import __version__
 
@@ -11,7 +9,7 @@ if __name__ == '__main__':
 
         name='webhdfs',
         version=__version__,
-        scripts=['webhdfs'],
+        scripts=['webhdfs3'],
         packages=['webhdfs'],
         package_dir={'webhdfs': 'lib/webhdfs'},
         license='LICENSE.txt',

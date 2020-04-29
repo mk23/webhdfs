@@ -11,21 +11,22 @@ import shlex
 import stat
 import sys
 import textwrap
-import urlparse
+import urllib.parse
 import zlib
 
-from errors import WebHDFSError
-from client import WebHDFSClient
-from attrib import LocalFSObject
+
+from .attrib import LocalFSObject
+from .client import WebHDFSClient
+from .errors import WebHDFSError
 
 # Work around python's overeager completer delimiters
-readline.set_completer_delims(readline.get_completer_delims().translate(None, '-'))
+readline.set_completer_delims(readline.get_completer_delims().translate({'-': None}))
 
 class WebHDFSPrompt(cmd.Cmd):
     def __init__(self, base, conf=None, path=None, task=None, wait=None):
         cmd.Cmd.__init__(self)
 
-        self.base = urlparse.urlparse(base)
+        self.base = urllib.parse.urlparse(base)
         self.user = getpass.getuser()
         self.hdfs = WebHDFSClient(self.base._replace(path='').geturl(), self.user, conf, wait)
 
@@ -83,7 +84,7 @@ class WebHDFSPrompt(cmd.Cmd):
 
         text = ' '.join('{%s:%s%s}' % (i, align.get(i, ''), lengths[i]) for i in columns)
         for item in objects:
-            print text.format(**item)
+            print(text.format(**item))
 
         return subdirs
 
@@ -111,7 +112,7 @@ class WebHDFSPrompt(cmd.Cmd):
         return '/'+'/'.join(rval)
 
     def _print_usage(self):
-        print getattr(self, inspect.stack()[1][3]).__doc__.strip().split('\n')[0]
+        print(getattr(self, inspect.stack()[1][3]).__doc__.strip().split('\n')[0])
 
     def _reset_prompt(self):
         self.prompt = '%s@%s r:%s l:%s> ' % (self.user, self.base.netloc, self.path, os.getcwd())
@@ -173,7 +174,7 @@ class WebHDFSPrompt(cmd.Cmd):
 
     def _complete_chmod(self, part):
         mode = int(part, 8) if part else 0
-        if len(part) < 4 and (mode << 3) < 0777:
+        if len(part) < 4 and (mode << 3) < 0o777:
             return [oct((mode << 3) + i) for i in range(1, 8)]
         else:
             return [oct(mode) + ' ']
@@ -200,7 +201,7 @@ class WebHDFSPrompt(cmd.Cmd):
         pass
 
     def default(self, arg):
-        print '%s: unknown command' % arg
+        print('%s: unknown command' % arg)
 
     def do_cd(self, path=None):
         '''
@@ -215,7 +216,7 @@ class WebHDFSPrompt(cmd.Cmd):
             self.path = path
         except WebHDFSError as e:
             self.path = '/'
-            print e
+            print(e)
         finally:
             self._reset_prompt()
 
@@ -229,7 +230,7 @@ class WebHDFSPrompt(cmd.Cmd):
             path = self._fix_path(path or pwd.getpwnam(self.user).pw_dir, local=True)
             os.chdir(path)
         except (KeyError, OSError) as e:
-            print e
+            print(e)
         finally:
             self._reset_prompt()
 
@@ -243,7 +244,7 @@ class WebHDFSPrompt(cmd.Cmd):
             path = self._fix_path(path)
             self._list_dir(self.hdfs.ls(path))
         except WebHDFSError as e:
-            print e
+            print(e)
 
     def do_lsr(self, path=None):
         '''
@@ -253,12 +254,12 @@ class WebHDFSPrompt(cmd.Cmd):
         '''
         try:
             path = self._fix_path(path)
-            print path + ':'
+            print(path + ':')
             for name in self._list_dir(self.hdfs.ls(path)):
-                print
+                print()
                 self.do_lsr('%s/%s' % (path, name))
         except WebHDFSError as e:
-            print e
+            print(e)
 
     def do_glob(self, path=None):
         '''
@@ -270,7 +271,7 @@ class WebHDFSPrompt(cmd.Cmd):
             path = self._fix_path(path, required='glob')
             self._list_dir(self.hdfs.glob(path))
         except WebHDFSError as e:
-            print e
+            print(e)
 
     def do_lls(self, path=None):
         '''
@@ -290,7 +291,7 @@ class WebHDFSPrompt(cmd.Cmd):
 
             self._list_dir(objs)
         except OSError as e:
-            print e
+            print(e)
 
     def do_du(self, args=''):
         '''
@@ -306,9 +307,9 @@ class WebHDFSPrompt(cmd.Cmd):
                 return self._print_usage()
 
             path = self._fix_path(args[0] if len(args) > 0 else None)
-            print self.hdfs.du(path, args[1] if len(args) == 2 else 'hdfs_usage')
+            print(self.hdfs.du(path, args[1] if len(args) == 2 else 'hdfs_usage'))
         except WebHDFSError as e:
-            print e
+            print(e)
 
     def do_mkdir(self, path):
         '''
@@ -322,7 +323,7 @@ class WebHDFSPrompt(cmd.Cmd):
                 raise WebHDFSError('%s: already exists' % path)
             self.hdfs.mkdir(path)
         except WebHDFSError as e:
-            print e
+            print(e)
 
     def do_mv(self, args):
         '''
@@ -340,7 +341,7 @@ class WebHDFSPrompt(cmd.Cmd):
             if not self.hdfs.mv(path, dest):
                 raise WebHDFSError('%s: failed to move/rename' % path)
         except WebHDFSError as e:
-            print e
+            print(e)
         except ValueError as e:
             self._print_usage()
 
@@ -356,7 +357,7 @@ class WebHDFSPrompt(cmd.Cmd):
                 raise WebHDFSError('%s: cannot remove directory' % path)
             self.hdfs.rm(path)
         except WebHDFSError as e:
-            print e
+            print(e)
 
     def do_rmdir(self, path):
         '''
@@ -373,7 +374,7 @@ class WebHDFSPrompt(cmd.Cmd):
                 raise WebHDFSError('%s: directory not empty' % path)
             self.hdfs.rm(path)
         except WebHDFSError as e:
-            print e
+            print(e)
 
     def do_chown(self, args):
         '''
@@ -389,7 +390,7 @@ class WebHDFSPrompt(cmd.Cmd):
             o, g = dest.split(':', 1) if ':' in dest else (dest, '')
             self.hdfs.chown(path, owner=o, group=g)
         except WebHDFSError as e:
-            print e
+            print(e)
         except ValueError:
             self._print_usage()
 
@@ -406,7 +407,7 @@ class WebHDFSPrompt(cmd.Cmd):
             path = self._fix_path(path, required='chmod')
             self.hdfs.chmod(path, perm)
         except WebHDFSError as e:
-            print e
+            print(e)
         except ValueError:
             self._print_usage()
 
@@ -431,7 +432,7 @@ class WebHDFSPrompt(cmd.Cmd):
 
             self.hdfs.touch(path, time)
         except WebHDFSError as e:
-            print e
+            print(e)
 
     def do_get(self, path):
         '''
@@ -445,9 +446,9 @@ class WebHDFSPrompt(cmd.Cmd):
                 raise WebHDFSError('%s: cannot download directory' % path)
             if os.path.exists(os.path.basename(path)):
                 raise WebHDFSError('%s: file exists' % path)
-            self.hdfs.get(path, data=open('%s/%s' % (os.getcwd(), os.path.basename(path)), 'w'))
+            self.hdfs.get(path, data=open('%s/%s' % (os.getcwd(), os.path.basename(path)), 'wb'))
         except (WebHDFSError, OSError) as e:
-            print e
+            print(e)
 
     def do_put(self, path):
         '''
@@ -462,9 +463,9 @@ class WebHDFSPrompt(cmd.Cmd):
                 raise WebHDFSError('%s: cannot upload directory' % path)
             if self.hdfs.stat(dest, catch=True):
                 raise WebHDFSError('%s: already exists' % dest)
-            self.hdfs.put(dest, data=open(path, 'r'))
+            self.hdfs.put(dest, data=open(path, 'rb'))
         except (WebHDFSError, OSError) as e:
-            print e
+            print(e)
 
     def do_cat(self, path):
         '''
@@ -478,7 +479,7 @@ class WebHDFSPrompt(cmd.Cmd):
                 raise WebHDFSError('%s: cannot cat directory' % path)
             sys.stdout.write(self.hdfs.get(path))
         except (WebHDFSError, OSError) as e:
-            print e
+            print(e)
 
     def do_zcat(self, path):
         '''
@@ -492,10 +493,10 @@ class WebHDFSPrompt(cmd.Cmd):
                 raise WebHDFSError('%s: cannot cat directory' % path)
             sys.stdout.write(zlib.decompress(self.hdfs.get(path), 16 + zlib.MAX_WBITS))
         except (WebHDFSError, OSError) as e:
-            print e
+            print(e)
 
     def do_EOF(self, line):
-        print
+        print()
         return True
 
 for name, func in vars(WebHDFSPrompt).items():

@@ -45,7 +45,7 @@ Table of Contents
 
 Prerequisites
 -------------
-* Python 2.7+
+* Python 3.4+
 * Python [requests](http://docs.python-requests.org/) module
 
 
@@ -361,11 +361,11 @@ Fetches the specified HDFS path.  Returns a string or writes a file, based on pa
 
 Parameters:
 * `path`: HDFS path to fetch
-* `data`: (_optional_) file-like object open for write
+* `data`: (_optional_) file-like object open for write in binary mode
 
 Returns:
 * Boolean `True` if data is set and written file size matches source
-* String contents of the fetched file if data is None
+* Bytes contents of the fetched file if data is None
 
 Raises:
 * `WebHDFSIncompleteTransferError`
@@ -378,7 +378,7 @@ Creates the specified HDFS file using the contents of a file open for read, or v
 
 Parameters:
 * `path`: HDFS path to fetch
-* `data`: file-like object open for read or string
+* `data`: file-like object open for read in binary mode, bytes, or string
 
 Returns:
 * Boolean `True` if written file size matches source

@@ -39,15 +39,18 @@ def perm_to_mode(perm):
 
     return ''.join(mode)
 
+def fix_encoding(bits):
+    return str(bits, 'utf8') if isinstance(bits, bytes) else bits
+
 
 class WebHDFSObject(object):
     def __init__(self, path, bits):
-        self.path = (path.encode('utf8') if isinstance(path, unicode) else path).rstrip('/')
+        self.path = path.rstrip('/')
         self.bits = bits
 
         if not self.bits['pathSuffix']:
             self.bits['pathSuffix'] = os.path.basename(self.path)
-            self.path = os.path.dirname(self.path).rstrip('/')
+            self.path = os.path.dirname(fix_encoding(self.path)).rstrip('/')
 
         self.calc = {
             'date': datetime.datetime.fromtimestamp(self.bits['modificationTime'] / 1000),
@@ -76,14 +79,14 @@ class WebHDFSObject(object):
 
     @property
     def owner(self):
-        return self.bits['owner'].encode('utf8')
+        return fix_encoding(self.bits['owner'])
     @property
     def group(self):
-        return self.bits['group'].encode('utf8')
+        return fix_encoding(self.bits['group'])
 
     @property
     def name(self):
-        return self.bits['pathSuffix'].encode('utf8') if isinstance(self.bits['pathSuffix'], unicode) else self.bits['pathSuffix']
+        return fix_encoding(self.bits['pathSuffix'])
     @property
     def full(self):
         return '%s/%s' % (self.path, self.name)
@@ -98,7 +101,7 @@ class WebHDFSObject(object):
 
     @property
     def kind(self):
-        return self.bits['type'].encode('utf8')
+        return fix_encoding(self.bits['type'])
 
     @property
     def date(self):

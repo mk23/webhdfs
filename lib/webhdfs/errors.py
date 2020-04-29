@@ -1,5 +1,7 @@
 import sys
 
+from .attrib import fix_encoding
+
 class WebHDFSError(Exception):
     def __init__(self, message='unknown error has occurred'):
         if isinstance(message, dict):
@@ -7,7 +9,7 @@ class WebHDFSError(Exception):
             e = message.get('RemoteException', {}).get('exception', 'UnknownException')
             c = getattr(sys.modules[__name__], 'WebHDFS'+e.replace('Exception', 'Error'), WebHDFSUnknownRemoteError)
 
-            raise c(m.encode('utf8') if isinstance(m, unicode) else m)
+            raise c(fix_encoding(m))
 
         Exception.__init__(self, message)
 

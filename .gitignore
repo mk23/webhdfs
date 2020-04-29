@@ -1,8 +1,9 @@
 *.sw*
 *.pyc
 build
-webhdfs.1
+.pybuild
+webhdfs3.1
 debian/files
-debian/python-webhdfs*
+debian/python3-webhdfs*
 debian/debhelper*
 *.egg-info/

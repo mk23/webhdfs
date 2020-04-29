@@ -7,14 +7,15 @@
 # This special exception was added by Craig Small in version 0.37 of dh-make.
 
 export DH_VERBOSE=1
+export PYBUILD_NAME=webhdfs
 
 %:
-	dh $@ --with python2
+	dh $@ --with python3 --buildsystem=pybuild
 
 override_dh_clean:
 	dh_clean
-	rm -rf webhdfs.egg-info webhdfs.1
+	rm -rf webhdfs.egg-info webhdfs3.1
 
 override_dh_auto_configure:
 	dh_auto_configure
-	H2M_ENABLED=1 PYTHONPATH=lib help2man -i debian/h2m -o webhdfs.1 ./webhdfs
+	H2M_ENABLED=1 PYTHONPATH=lib help2man -i debian/h2m -o webhdfs3.1 ./webhdfs3
